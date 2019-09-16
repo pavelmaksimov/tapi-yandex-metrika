@@ -28,10 +28,11 @@ class YandexMetrikaClientError(YandexMetrikaApiError):
         self.jdata = self.response.json()
         self.code = self.jdata.get("code")
         self.message = self.jdata.get("message")
+        self.errors = self.jdata.get("errors")
 
     def __str__(self):
-        return "code={}, message={}".format(
-            self.code, self.message
+        return "code={}, message={}, errors={}".format(
+            self.code, self.message, self.errors
         )
 
 
