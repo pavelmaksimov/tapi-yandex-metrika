@@ -4,6 +4,7 @@
 venv
 .idea
 config.yml
+.cache
 
 # C extensions
 *.so
