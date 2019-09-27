@@ -10,10 +10,10 @@ class YandexMetrikaApiError(Exception):
     def __str__(self):
         logging.info("HEADERS = " + str(self.response.headers))
         logging.info("URL = " + self.response.url)
-        return "{}{} {} {}".format(
-            self.message + " " or "",
+        return "{} {} {} {}".format(
             self.response.status_code,
             self.response.reason,
+            self.message or "",
             self.response.text
         )
 
@@ -31,6 +31,8 @@ class YandexMetrikaClientError(YandexMetrikaApiError):
         self.errors = self.jdata.get("errors")
 
     def __str__(self):
+        logging.info("HEADERS = " + str(self.response.headers))
+        logging.info("URL = " + self.response.url)
         return "code={}, message={}, errors={}".format(
             self.code, self.message, self.errors
         )
