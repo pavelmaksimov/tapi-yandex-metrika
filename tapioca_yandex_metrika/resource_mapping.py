@@ -31,37 +31,44 @@ LOGSAPI_RESOURCE_MAPPING = {
     "allinfo": {
         "resource": "management/v1/counter/{counterId}/logrequests",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/logs/queries/getlogrequests-docpage/",
-        "params": None
+        "params": None,
+        "methods": ["GET"],
     },
     "info": {
         "resource": "management/v1/counter/{counterId}/logrequest/{requestId}",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/logs/queries/getlogrequest-docpage/",
-        "params": None
+        "params": None,
+        "methods": ["GET"],
     },
     "download": {
         "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/part/{partNumber}/download",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/logs/queries/download-docpage/",
-        "params": None
+        "params": None,
+        "methods": ["GET"],
     },
     "clean": {
         "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/clean",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/logs/queries/clean-docpage/",
-        "params": None
+        "params": None,
+        "methods": ["POST"],
     },
     "cancel": {
         "resource": "management/v1/counter/{counterId}/logrequest/{requestId}/cancel",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/logs/queries/cancel-docpage/",
-        "params": None
+        "params": None,
+        "methods": ["POST"],
     },
     "create": {
         "resource": "management/v1/counter/{counterId}/logrequests",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/logs/queries/createlogrequest-docpage/",
         "params": ["date1", "date2", "fields", "source"],
+        "methods": ["POST"],
     },
     "evaluate": {
         "resource": "management/v1/counter/{counterId}/logrequests/evaluate",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/logs/queries/evaluate-docpage/",
         "params": ["date1", "date2", "fields", "source"],
+        "methods": ["GET"],
     },
 }
 
