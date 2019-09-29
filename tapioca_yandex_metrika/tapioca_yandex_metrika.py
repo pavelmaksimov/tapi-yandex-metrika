@@ -105,7 +105,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
         else:
             return results[0] if isinstance(results, list) and results else results
 
-    def to_json(self, data, request_kwargs, response, api_params, *args, **kwargs):
+    def transform(self, data, request_kwargs, response, api_params, *args, **kwargs):
         """Преобразование данных"""
         if response.url.find("download") > -1:
             return [i.split("\t") for i in data.split("\n")][:-1]
