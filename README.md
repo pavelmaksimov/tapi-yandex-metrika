@@ -4,7 +4,7 @@
 
 ## Установка
 ```
-pip install --upgrade git+https://github.com/pavelmaksimov/tapioca-wrapper#egg=tapioca-wrapper-2019.9.15
+pip install --upgrade git+https://github.com/pavelmaksimov/tapioca-wrapper#egg=tapioca-wrapper-2019.9.29
 pip install --upgrade git+https://github.com/pavelmaksimov/tapioca-yandex-metrika.git
 ```
 
