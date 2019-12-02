@@ -229,15 +229,17 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
         offset = current_result["query"]["offset"] + limit
 
         if offset <= total_rows:
+            logging.warning(
+                "Получены не все данные: {} строк из {}"
+                    .format(offset, total_rows)
+            )
             if api_params.get("receive_all_data", False):
                 logging.warning(
-                    "Получены не все данные. Будет сделан дополнительный запрос"
+                    "Будет сделан дополнительный запрос"
                 )
                 new_request_kwargs = current_request_kwargs.copy()
                 new_request_kwargs["params"]["offset"] = offset
                 request_kwargs_list.append(new_request_kwargs)
-            else:
-                logging.warning("Получены не все данные")
         return request_kwargs_list
 
     def transform(self, data, request_kwargs, response, api_params, *args, **kwargs):
