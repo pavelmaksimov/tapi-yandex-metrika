@@ -2,9 +2,14 @@
 ```python
 from tapioca_yandex_metrika import YandexMetrikaLogsapi
 
-ACCESS_TOKEN = {ваш токен доступа}
 
-api = YandexMetrikaLogsapi(access_token=ACCESS_TOKEN)
+ACCESS_TOKEN = {ваш токен доступа}
+COUNTER_ID = {идентификатор счетчика}
+
+api = YandexMetrikaLogsapi(
+    access_token=ACCESS_TOKEN,
+    default_url_params={'counterId': COUNTER_ID}
+)
 
 params={
     "fields": "ym:s:date,ym:s:clientID",
@@ -48,7 +53,7 @@ result = api.info(requestId=request_id).get()
 if result["log_request"]["status"] == "processed":
     # Отчет может состоять из нескольких частей.
     parts = result["log_request"]["parts"]  # Кол-во частей в отчете.
-    print(parts)
+    print("Кол-во частей", parts)
     # В параметр partNumber указывается номер части отчета, который хотите скачать. 
     # Скачаем первую часть.
     result = api.download(requestId=request_id, partNumber=0).get()
@@ -64,19 +69,23 @@ else:
 from tapioca_yandex_metrika import YandexMetrikaLogsapi
 
 ACCESS_TOKEN = {ваш токен доступа}
+COUNTER_ID = {идентификатор счетчика}
 
 api = YandexMetrikaLogsapi(
     access_token=ACCESS_TOKEN,
-    # Если True, скачает часть отчета, когда он будет сформирован.
+    default_url_params={'counterId': COUNTER_ID},
+    # Если True, скачает первую часть отчета, когда он будет сформирован. 
+    # По умолчанию False.
     wait_report=True,  
     # Если True, будет скачивать все части отчета.
+    # По умолчанию False.
     receive_all_data=True  
 )
 params={
     "fields": "ym:s:date,ym:s:clientID,ym:s:dateTime,ym:s:startURL,ym:s:endURL",
     "source": "visits",
-    "date1": "2018-01-01",
-    "date2": "2020-01-01"
+    "date1": "2019-01-01",
+    "date2": "2019-01-01"
 }
 result = api.create().get(params=params)
 request_id = result().data["log_request"]["request_id"]
@@ -105,12 +114,15 @@ data = result().data
 print(data)
 ```
 
-Есть метод преобразования данных для ресурса download.
+Есть метод преобразования данных для ресурса **download**.
 ```python
+result = api.download(requestId=request_id).get()
 data_as_json = result().transform()
 print(data_as_json[:2])
-[['ym:s:date', 'ym:s:startOfMonth', 'ym:s:visits', 'ym:s:bounces'],
- ['2019-09-26', '2019-09-01', 80384.0, 9389.0]]
+[
+    ['ym:s:date', 'ym:s:startOfMonth', 'ym:s:visits', 'ym:s:bounces'],
+    ['2019-09-26', '2019-09-01', 80384.0, 9389.0]
+ ]
 ``` 
 
 ## Фичи
