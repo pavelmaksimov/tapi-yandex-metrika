@@ -72,9 +72,8 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiocaAdapter):
                 raise exceptions.YandexMetrikaLimitError(response)
             elif error_code == 403:
                 raise exceptions.YandexMetrikaTokenError(response)
-            elif (
-                message == "Incorrect part number"
-                and api_params.get("receive_all_data", False)
+            elif message == "Incorrect part number" and api_params.get(
+                "receive_all_data", False
             ):
                 # Срабатывает при попытке скачать несуществующую часть отчета.
                 # А при получении всех частей отчета автоматически,
@@ -224,19 +223,15 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
         sampled = current_result["sampled"]
 
         logging.info("Наличие семплирования: " + str(sampled))
-
-        limit = current_result["query"]["limit"]
+        limit = current_request_kwargs["params"].get("limit", 10000)
         offset = current_result["query"]["offset"] + limit
 
         if offset <= total_rows:
             logging.warning(
-                "Получены не все данные: {} строк из {}"
-                    .format(offset, total_rows)
+                "Получено строк {}. Всего строк {}".format(offset-1, total_rows)
             )
             if api_params.get("receive_all_data", False):
-                logging.warning(
-                    "Будет сделан дополнительный запрос"
-                )
+                logging.warning("Будет сделан дополнительный запрос")
                 new_request_kwargs = current_request_kwargs.copy()
                 new_request_kwargs["params"]["offset"] = offset
                 request_kwargs_list.append(new_request_kwargs)
