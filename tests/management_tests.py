@@ -18,11 +18,38 @@ api = YandexMetrikaManagement(
 
 
 def test_info():
-    api.counters().info()
+    api.goals().info()
 
 
 def test_get_counters():
-    r = api.counters().get()
+    r = api.counters().get(params={"sort": "Visits"})
     print(r)
     print(r().data)
 
+
+def test_get_clients():
+    r = api.clients().get()
+    print(r)
+
+
+def test_get_goals():
+    r = api.goals().get()
+    print(r)
+
+
+def test_create_goal():
+    body = {
+        "goal": {
+            "name": "2 страницы",
+            "type": "number",
+            "is_retargeting": 0,
+            "depth": 2
+        }
+    }
+    r = api.goals().post(data=body)
+    print(r)
+
+
+def test_get_goal():
+    r = api.goal(goalId=13571870).get()
+    print(r)
