@@ -11,12 +11,8 @@ import os
 import re
 import sys
 
-try:
-    import pypandoc
-
-    readme = pypandoc.convert("README.md", "rst")
-except (IOError, ImportError):
-    readme = ""
+with open("README.md", "r", encoding="utf8") as fh:
+    readme = fh.read()
 
 package = "tapi_yandex_metrika"
 
