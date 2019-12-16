@@ -4,7 +4,7 @@ __author__ = 'Pavel Maksimov'
 __email__ = 'vur21@ya.com'
 __version__ = '2019.9.29'
 
-from .tapioca_yandex_metrika import (
+from .tapi_yandex_metrika import (
     YandexMetrikaStats,
     YandexMetrikaLogsapi,
     YandexMetrikaManagement

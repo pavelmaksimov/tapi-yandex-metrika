@@ -1,6 +1,6 @@
 ## Документация по Logs API
 ```python
-from tapioca_yandex_metrika import YandexMetrikaLogsapi
+from tapi_yandex_metrika import YandexMetrikaLogsapi
 
 
 ACCESS_TOKEN = {ваш токен доступа}
@@ -66,7 +66,7 @@ else:
 В библиотеке есть функция, которая
 подождет, когда отчет будет сформирован и скачает все его части.
 ```python
-from tapioca_yandex_metrika import YandexMetrikaLogsapi
+from tapi_yandex_metrika import YandexMetrikaLogsapi
 
 ACCESS_TOKEN = {ваш токен доступа}
 COUNTER_ID = {идентификатор счетчика}
@@ -96,7 +96,7 @@ print(data[:1000])
 ``` 
 
 #### Формат возвращаемых данных.
-Данные возвращаются в формате объекта **Tapioca**.
+Данные возвращаются в формате объекта **Tapi**.
 
 ```python
 result = api.allinfo().get()

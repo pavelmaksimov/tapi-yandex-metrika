@@ -3,7 +3,7 @@ import logging
 from pprint import pprint
 import yaml
 
-from tapioca_yandex_metrika import YandexMetrikaStats
+from tapi_yandex_metrika import YandexMetrikaStats
 
 logging.basicConfig(level=logging.DEBUG)
 

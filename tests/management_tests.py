@@ -2,7 +2,7 @@
 import logging
 import yaml
 
-from tapioca_yandex_metrika import YandexMetrikaManagement
+from tapi_yandex_metrika import YandexMetrikaManagement
 
 logging.basicConfig(level=logging.DEBUG)
 

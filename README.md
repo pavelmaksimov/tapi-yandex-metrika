@@ -4,19 +4,18 @@
 
 ## Установка
 ```
-pip install --upgrade git+https://github.com/pavelmaksimov/tapioca-wrapper#egg=tapioca-wrapper-2019.9.30
-pip install --upgrade git+https://github.com/pavelmaksimov/tapioca-yandex-metrika.git
+pip install tapi-yandex-metrika
 ```
 
-Документация по API [управления счетчиком](https://github.com/pavelmaksimov/tapioca-yandex-metrika/blob/master/docs/management.md)
+Документация по API [управления счетчиком](https://github.com/pavelmaksimov/tapi-yandex-metrika/blob/master/docs/management.md)
 
-Документация по API [получения отчетов](https://github.com/pavelmaksimov/tapioca-yandex-metrika/blob/master/docs/stats.md)
+Документация по API [получения отчетов](https://github.com/pavelmaksimov/tapi-yandex-metrika/blob/master/docs/stats.md)
 
-Документация по [Logs API](https://github.com/pavelmaksimov/tapioca-yandex-metrika/blob/master/docs/logsapi.md)
+Документация по [Logs API](https://github.com/pavelmaksimov/tapi-yandex-metrika/blob/master/docs/logsapi.md)
 
 ## Зависимости
 - requests 
-- [tapioca_wrapper](https://github.com/pavelmaksimov/tapioca-wrapper) 
+- [tapi_wrapper](https://github.com/pavelmaksimov/tapi-wrapper) 
 
 ## Автор
 Павел Максимов
@@ -28,5 +27,3 @@ pip install --upgrade git+https://github.com/pavelmaksimov/tapioca-yandex-metrik
 
 Удачи тебе, друг! Поставь звездочку ;)
 
-## Другое
-- Как работает обертка [Tapioca](http://tapioca-wrapper.readthedocs.org/en/stable/quickstart.html)

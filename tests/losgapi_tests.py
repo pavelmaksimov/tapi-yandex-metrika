@@ -1,7 +1,7 @@
 # coding: utf-8
 import logging
 import yaml
-from tapioca_yandex_metrika import YandexMetrikaLogsapi
+from tapi_yandex_metrika import YandexMetrikaLogsapi
 
 logging.basicConfig(level=logging.DEBUG)
 

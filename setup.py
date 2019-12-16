@@ -18,7 +18,7 @@ try:
 except (IOError, ImportError):
     readme = ""
 
-package = "tapioca_yandex_metrika"
+package = "tapi_yandex_metrika"
 
 
 def get_version(package):
@@ -41,19 +41,19 @@ if sys.argv[-1] == "publish":
     sys.exit()
 
 setup(
-    name="tapioca-yandex-metrika",
+    name="tapi-yandex-metrika",
     version=get_version(package),
-    description="Yandex Metrika API wrapper using tapioca",
+    description="Python библиотека для API Яндекс Метрики",
     long_description=readme,
+    long_description_content_type="text/markdown",
     author="Pavel Maksimov",
     author_email="vur21@ya.ru",
-    url="https://github.com/pavelmaksimov/tapioca-yandex-metrika",
-    packages=["tapioca_yandex_metrika"],
-    package_dir={"tapioca_yandex_metrika": "tapioca_yandex_metrika"},
+    url="https://github.com/pavelmaksimov/tapi-yandex-metrika",
+    packages=[package],
     include_package_data=True,
-    install_requires=["requests-oauthlib>=0.4.2"],
+    install_requires=["requests-oauthlib>=0.4.2", "tapi-wrapper==2019.12.10"],
     license="MIT",
     zip_safe=False,
-    keywords="tapioca-yandex-metrika",
+    keywords="tapi,wrapper,yandex,metrika,api",
     test_suite="tests",
 )

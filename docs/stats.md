@@ -1,7 +1,7 @@
 ## Документация по скачиванию отчетов из Я.Метрика
 
 ``` python
-from tapioca_yandex_metrika import YandexMetrikaStats
+from tapi_yandex_metrika import YandexMetrikaStats
 
 ACCESS_TOKEN = {ваш токен доступа}
 
@@ -42,7 +42,7 @@ print(result.data)
 ```
 
 #### Формат возвращаемых данных.
-Данные возвращаются в формате объекта **Tapioca**.
+Данные возвращаются в формате объекта **Tapi**.
 
 ```python
 print(result)

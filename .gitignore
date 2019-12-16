@@ -5,6 +5,7 @@ venv
 .idea
 config.yml
 .cache
+.pypirc
 
 # C extensions
 *.so

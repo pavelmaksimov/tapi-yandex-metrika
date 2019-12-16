@@ -4,10 +4,10 @@ import logging
 import time
 import re
 
-from tapioca import TapiocaAdapter, generate_wrapper_from_adapter, JSONAdapterMixin
-from tapioca.exceptions import ResponseProcessException, ClientError
+from tapi import TapiAdapter, generate_wrapper_from_adapter, JSONAdapterMixin
+from tapi.exceptions import ResponseProcessException, ClientError
 
-from tapioca_yandex_metrika import exceptions
+from tapi_yandex_metrika import exceptions
 from .resource_mapping import (
     STATS_RESOURCE_MAPPING,
     LOGSAPI_RESOURCE_MAPPING,
@@ -15,7 +15,7 @@ from .resource_mapping import (
 )
 
 
-class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiocaAdapter):
+class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
     resource_mapping = MANAGEMENT_RESOURCE_MAPPING
 
     def get_api_root(self, api_params):
@@ -58,7 +58,7 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiocaAdapter):
                 return response.text
 
     def wrapper_call_exception(
-        self, response, tapioca_exception, api_params, *args, **kwargs
+        self, response, tapi_exception, api_params, *args, **kwargs
     ):
         try:
             jdata = response.json()
@@ -95,7 +95,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             and responses[0].url.find("download") > -1
         ):
             # Собирает все части отчета в один текст.
-            data = ""
+            data, cols = "", ""
             for i in results:
                 cols = i[:i.find("\n")]
                 # Допонлительно удаляется пустая последняя строка.
@@ -116,7 +116,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
     def retry_request(
         self,
         response,
-        tapioca_exception,
+        tapi_exception,
         api_params,
         count_request_error,
         *args,
@@ -125,12 +125,12 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
         """
         Условия повторения запроса.
 
-        response = tapioca_exception.client().response
-        status_code = tapioca_exception.client().status_code
-        response_data = tapioca_exception.client().data
+        response = tapi_exception.client().response
+        status_code = tapi_exception.client().status_code
+        response_data = tapi_exception.client().data
         """
-        status_code = tapioca_exception.client().status_code
-        response_data = tapioca_exception.client().data or {}
+        status_code = tapi_exception.client().status_code
+        response_data = tapi_exception.client().data or {}
         error_code = int((response_data).get("code", 0))
         message = response_data.get("message")
 
@@ -184,7 +184,7 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
     def retry_request(
         self,
         response,
-        tapioca_exception,
+        tapi_exception,
         api_params,
         count_request_error,
         *args,
@@ -193,12 +193,12 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
         """
         Условия повторения запроса.
 
-        response = tapioca_exception.client().response
-        status_code = tapioca_exception.client().status_code
-        response_data = tapioca_exception.client().data
+        response = tapi_exception.client().response
+        status_code = tapi_exception.client().status_code
+        response_data = tapi_exception.client().data
         """
-        status_code = tapioca_exception.client().status_code
-        response_data = tapioca_exception.client().data
+        status_code = tapi_exception.client().status_code
+        response_data = tapi_exception.client().data
         error_code = int((response_data or {}).get("code", 0))
 
         if error_code == 429:

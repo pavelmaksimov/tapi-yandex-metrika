@@ -1,7 +1,7 @@
 ## Документация по API управления счетчиком Я.Метрики
 
 ``` python
-from tapioca_yandex_metrika import YandexMetrikaManagement
+from tapi_yandex_metrika import YandexMetrikaManagement
 
 ACCESS_TOKEN = {ваш токен доступа}
 COUNTER_ID = {идентификатор счетчика}
@@ -59,11 +59,11 @@ result = api.goal(goalId=10000).delete()
 
 Доступные параметры ресурсов и идентификаторы объектов, которые нужно обязательно указывать в методе, ищите в 
 [справке](https://yandex.ru/dev/metrika/doc/api2/management/intro-docpage/) 
-и/или в [карте ресурсов](https://github.com/pavelmaksimov/tapioca-yandex-metrika/blob/master/tapioca_yandex_metrika/resource_mapping.py).
+и/или в [карте ресурсов](https://github.com/pavelmaksimov/tapi-yandex-metrika/blob/master/tapi_yandex_metrika/resource_mapping.py).
 
 
 #### Формат возвращаемых данных.
-Данные возвращаются в формате объекта **Tapioca**.
+Данные возвращаются в формате объекта **Tapi**.
 
 ```python
 print(result)
