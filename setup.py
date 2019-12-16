@@ -9,7 +9,6 @@ except ImportError:
 
 import os
 import re
-import sys
 
 with open("README.md", "r", encoding="utf8") as fh:
     readme = fh.read()
@@ -26,15 +25,6 @@ def get_version(package):
         1
     )
 
-
-# python setup.py register
-if sys.argv[-1] == "publish":
-    os.system("python setup.py sdist upload")
-    args = {"version": get_version(package)}
-    print("You probably want to also tag the version now:")
-    print("  git tag -a %(version)s -m 'version %(version)s'" % args)
-    print("  git push --tags")
-    sys.exit()
 
 setup(
     name="tapi-yandex-metrika",
