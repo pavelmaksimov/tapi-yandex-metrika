@@ -18,37 +18,37 @@ params={
     "date2": "2019-01-01"
 }
 
-# Проверить возможность создания отчета.
+# Проверить возможность создания отчета. Через HTTP метод GET.
 result = api.evaluate().get(params=params)
 print(result)
 
 
-# Заказать отчет.
+# Заказать отчет. Через HTTP метод GET.
 result = api.create().get(params=params)
 request_id = result().data["log_request"]["request_id"]
 print(result)
 
 
-# Отменить создание отчета.
+# Отменить создание отчета. Через HTTP метод POST.
 result = api.cancel(requestId=request_id).post()
 print(result)
 
 
-# Получить информацию обо всех отчетах хранящихся на сервере.
+# Получить информацию обо всех отчетах хранящихся на сервере. Через HTTP метод GET.
 result = api.allinfo().get()
 print(result)
 
 
-# Получить информацию о конкретном отчете.
+# Получить информацию о конкретном отчете. Через HTTP метод GET.
 result = api.info(requestId=request_id).get()
 print(result)
 
 
-# Скачать отчет
+# Скачать отчет. Через HTTP метод GET.
 result = api.create().get(params=params)
 request_id = result().data["log_request"]["request_id"]
 
-# Отчет можно скачать, когда он будет сформирован на сервере.
+# Отчет можно скачать, когда он будет сформирован на сервере. Через HTTP метод GET.
 result = api.info(requestId=request_id).get()
 if result["log_request"]["status"] == "processed":
     # Отчет может состоять из нескольких частей.
