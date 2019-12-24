@@ -23,14 +23,19 @@ result = api.evaluate().get(params=params)
 print(result)
 
 
-# Заказать отчет. Через HTTP метод GET.
-result = api.create().get(params=params)
+# Заказать отчет. Через HTTP метод POST.
+result = api.create().post(params=params)
 request_id = result().data["log_request"]["request_id"]
 print(result)
 
 
 # Отменить создание отчета. Через HTTP метод POST.
 result = api.cancel(requestId=request_id).post()
+print(result)
+
+
+# Удалить отчет. Через HTTP метод POST.
+result = api.clean(requestId=request_id).post()
 print(result)
 
 
@@ -44,8 +49,8 @@ result = api.info(requestId=request_id).get()
 print(result)
 
 
-# Скачать отчет. Через HTTP метод GET.
-result = api.create().get(params=params)
+# Скачать отчет. Через HTTP метод POST.
+result = api.create().post(params=params)
 request_id = result().data["log_request"]["request_id"]
 
 # Отчет можно скачать, когда он будет сформирован на сервере. Через HTTP метод GET.
@@ -87,7 +92,7 @@ params={
     "date1": "2019-01-01",
     "date2": "2019-01-01"
 }
-result = api.create().get(params=params)
+result = api.create().post(params=params)
 request_id = result().data["log_request"]["request_id"]
 # Когда включен параметр receive_all_data=True, параметр partNumber можно не указывать.
 result = api.download(requestId=request_id).get()
@@ -124,6 +129,17 @@ print(data_as_json[:2])
     ['2019-09-26', '2019-09-01', 80384.0, 9389.0]
  ]
 ``` 
+
+Обращайте внимание каким HTTP методом вы отправляете запрос. 
+Некоторые ресурсы работают только с POST или только с GET запросами.
+Например ресурс **create** только с методом POST
+
+    api.create().post(params=params)
+    
+А метод **evaluate** только с методом GET
+
+    api.evaluate().get(params=params)
+
 
 ## Фичи
 

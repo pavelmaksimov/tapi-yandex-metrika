@@ -7,7 +7,6 @@ ACCESS_TOKEN = {ваш токен доступа}
 
 api = YandexMetrikaStats(access_token=ACCESS_TOKEN)
 
-# Все доступные параметры ищите в справке Я.Метрики
 params = dict(
     ids="178620",
     metrics="ym:s:visits,ym:s:bounces",
@@ -40,6 +39,9 @@ params = dict(
 result = api.stats().get(params=params)
 print(result.data)
 ```
+
+Доступные [параметры](https://yandex.ru/dev/metrika/doc/api2/api_v1/data-docpage/)
+отчетов.
 
 #### Формат возвращаемых данных.
 Данные возвращаются в формате объекта **Tapi**.
