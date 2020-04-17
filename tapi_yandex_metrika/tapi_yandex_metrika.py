@@ -1,9 +1,10 @@
 # coding: utf-8
 import json
 import logging
-import time
 import re
+import time
 
+import simplejson
 from tapi import TapiAdapter, generate_wrapper_from_adapter, JSONAdapterMixin
 from tapi.exceptions import ResponseProcessException, ClientError
 
@@ -56,7 +57,7 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
         if response.content.strip():
             try:
                 return response.json()
-            except json.JSONDecodeError:
+            except (json.JSONDecodeError, simplejson.JSONDecodeError):
                 return response.text
 
     def wrapper_call_exception(
@@ -101,7 +102,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             for i in results:
                 cols = i[:i.find("\n")]
                 # Допонлительно удаляется пустая последняя строка.
-                data += i[i.find("\n")+1:-1]
+                data += i[i.find("\n") + 1:-1]
             return "{}\n{}\n".format(cols, data)
         else:
             return results[0] if isinstance(results, list) and results else results
