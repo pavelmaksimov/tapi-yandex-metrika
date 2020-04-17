@@ -14,6 +14,8 @@ from .resource_mapping import (
     MANAGEMENT_RESOURCE_MAPPING,
 )
 
+logging.basicConfig(level=logging.INFO)
+
 
 class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
     resource_mapping = MANAGEMENT_RESOURCE_MAPPING
