@@ -13,17 +13,17 @@ api = YandexMetrikaManagement(
 ```
 
 Генерация класса YandexMetrikaManagement происходит динамически, поэтому узнать о добавленных ресурсах API, можно так.
-    
+
     print(dir(api))
 
 Пример
 
 ```python
 # Получить счетчики. Через HTTP метод GET.
-result = api.counters().get()
+api.counters().get()
 
 # Получить счетчики с сортировкой по визитам. Через HTTP метод GET.
-result = api.counters().get(params={"sort": "Visits"})
+api.counters().get(params={"sort": "Visits"})
 
 # Создать цель. Через HTTP метод POST.
 body = {
@@ -34,12 +34,12 @@ body = {
             "depth": 2
         }
     }
-result = api.goals().post(data=body)
+api.goals().post(data=body)
 
 # Для некоторых ресурсов необходимо подставлять в url идентификатор объекта.
-# Это делается путем добавления в сам метод идентификатора. 
+# Это делается путем добавления в сам метод идентификатора.
 # Получить информацию о цели. Через HTTP метод GET.
-result = api.goal(goalId=10000).get()
+api.goal(goalId=10000).get()
 
 # Изменить цель. Через HTTP метод PUT.
 body = {
@@ -51,33 +51,30 @@ body = {
         ...
     }
 }
-result = api.goal(goalId=10000).put(data=body)
+api.goal(goalId=10000).put(data=body)
 
 # Удалить цель. Через HTTP метод DELETE.
-result = api.goal(goalId=10000).delete()
-``` 
+api.goal(goalId=10000).delete()
+```
 
-Доступные параметры ресурсов и идентификаторы объектов, которые нужно обязательно указывать в методе, ищите в 
-[справке](https://yandex.ru/dev/metrika/doc/api2/management/intro-docpage/) 
+Доступные параметры ресурсов и идентификаторы объектов, которые нужно обязательно указывать в методе, ищите в
+[справке](https://yandex.ru/dev/metrika/doc/api2/management/intro-docpage/)
 и/или в [карте ресурсов](https://github.com/pavelmaksimov/tapi-yandex-metrika/blob/master/tapi_yandex_metrika/resource_mapping.py).
 
 
-#### Формат возвращаемых данных.
-Данные возвращаются в формате объекта **Tapi**.
+#### Получить данные ответа.
+```python
+result = api.counters().get()
+data = result().data
+print(data)
+```
 
+Можно получить информацию о запросе.
 ```python
 print(result)
-# Можно получить информацию о запросе.
 print(result().status_code)
 print(result().response)
 print(result().response.headers)
-``` 
-
-##### Вернуть в формате **JSON**
-```python
-result = api.stats().get(params=params)
-data = result().data
-print(data)
 ```
 
 ## Фичи
@@ -95,9 +92,9 @@ api.counters().open_in_browser()
 ## Автор
 Павел Максимов
 
-Связаться со мной можно в 
-[Телеграм](https://t.me/pavel_maksimow) 
-и в 
+Связаться со мной можно в
+[Телеграм](https://t.me/pavel_maksimow)
+и в
 [Facebook](https://www.facebook.com/pavel.maksimow)
 
 Удачи тебе, друг! Поставь звездочку ;)
