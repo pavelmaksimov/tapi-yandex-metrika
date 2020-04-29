@@ -142,11 +142,12 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             and api_params.get("wait_report", False)
             and response.url.find("download") > -1
         ):
-            logging.info("Включен режим ожидания готовности отчета")
+            sleep_time = count_request_error * 20
             logging.info(
-                "Ожидание готовности отчета {} сек.".format(count_request_error * 20)
+                "Включен режим ожидания готовности отчета. ",
+                "Проверка готовности отчета через {} сек.".format(sleep_time)
             )
-            time.sleep(count_request_error * 20)
+            time.sleep(sleep_time)
             return True
 
         return False
@@ -163,11 +164,11 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             api_params.get("receive_all_data", False)
             and response.url.find("download") > -1
         ):
-            logging.info("Включен режим получения всех данных")
-            logging.info("Будет сделан запрос на получение других частей отчета")
             url = current_request_kwargs["url"]
             part = int(re.findall(r"part/([0-9]*)/", url)[0])
             new_part = part + 1
+            logging.info("Включен режим получения всех данных. "
+                         f"Запрашиваю следующую часть отчета: {new_part}")
             new_url = re.sub(r"part/[0-9]*/", "part/{}/".format(new_part), url)
             new_request_kwargs = {**current_request_kwargs, "url": new_url}
             request_kwargs_list.append(new_request_kwargs)
@@ -230,11 +231,12 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
         offset = current_result["query"]["offset"] + limit
 
         if offset <= total_rows:
-            logging.warning(
+            logging.info(
                 "Получено строк {}. Всего строк {}".format(offset-1, total_rows)
             )
             if api_params.get("receive_all_data", False):
-                logging.warning("Будет сделан дополнительный запрос")
+                logging.info("Включен режим получения всех данных. "
+                             "Запрашиваю следующие части отчета.")
                 new_request_kwargs = current_request_kwargs.copy()
                 new_request_kwargs["params"]["offset"] = offset
                 request_kwargs_list.append(new_request_kwargs)
