@@ -59,7 +59,7 @@ if result["log_request"]["status"] == "processed":
     # Отчет может состоять из нескольких частей.
     parts = result["log_request"]["parts"]  # Кол-во частей в отчете.
     print("Кол-во частей", parts)
-    # В параметр partNumber указывается номер части отчета, который хотите скачать. 
+    # В параметр partNumber указывается номер части отчета, который хотите скачать.
     # Скачаем первую часть.
     result = api.download(requestId=request_id, partNumber=0).get()
     data = result().data
@@ -79,12 +79,12 @@ COUNTER_ID = {идентификатор счетчика}
 api = YandexMetrikaLogsapi(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID},
-    # Если True, скачает первую часть отчета, когда он будет сформирован. 
+    # Если True, скачает первую часть отчета, когда он будет сформирован.
     # По умолчанию False.
-    wait_report=True,  
+    wait_report=True,
     # Если True, будет скачивать все части отчета.
     # По умолчанию False.
-    receive_all_data=True  
+    receive_all_data=True
 )
 params={
     "fields": "ym:s:date,ym:s:clientID,ym:s:dateTime,ym:s:startURL,ym:s:endURL",
@@ -98,25 +98,6 @@ request_id = result().data["log_request"]["request_id"]
 result = api.download(requestId=request_id).get()
 data = result().data
 print(data[:1000])
-``` 
-
-#### Формат возвращаемых данных.
-Данные возвращаются в формате объекта **Tapi**.
-
-```python
-result = api.allinfo().get()
-print(result)
-# Можно получить информацию о сделанном запросе
-print(result().status_code)
-print(result().response)
-print(result().response.headers)
-``` 
-
-Вернуть данные в формате **JSON**
-```python
-result = api.allinfo().get()
-data = result().data
-print(data)
 ```
 
 Есть метод преобразования данных для ресурса **download**.
@@ -128,14 +109,23 @@ print(data_as_json[:2])
     ['ym:s:date', 'ym:s:startOfMonth', 'ym:s:visits', 'ym:s:bounces'],
     ['2019-09-26', '2019-09-01', 80384.0, 9389.0]
  ]
-``` 
+```
 
-Обращайте внимание каким HTTP методом вы отправляете запрос. 
+Можно получить информацию о последнем сделанном запросе
+
+```python
+result = api.allinfo().get()
+print(result().status_code)
+print(result().response)
+print(result().response.headers)
+```
+
+Обращайте внимание каким HTTP методом вы отправляете запрос.
 Некоторые ресурсы работают только с POST или только с GET запросами.
 Например ресурс **create** только с методом POST
 
     api.create().post(params=params)
-    
+
 А метод **evaluate** только с методом GET
 
     api.evaluate().get(params=params)
@@ -157,9 +147,9 @@ api.create().open_docs()
 ## Автор
 Павел Максимов
 
-Связаться со мной можно в 
-[Телеграм](https://t.me/pavel_maksimow) 
-и в 
+Связаться со мной можно в
+[Телеграм](https://t.me/pavel_maksimow)
+и в
 [Facebook](https://www.facebook.com/pavel.maksimow)
 
 Удачи тебе, друг! Поставь звездочку ;)
