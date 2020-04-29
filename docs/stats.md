@@ -17,15 +17,15 @@ params = dict(
 result = api.stats().get(params=params)
 print(result().data)
 
-# По умолчанию возвращаются только 10000 строк отчета, 
+# По умолчанию возвращаются только 10000 строк отчета,
 # если не указать другое кол-во в параметре limit.
-# В отчете может быть больше строк, чем указано в limit 
+# В отчете может быть больше строк, чем указано в limit
 # Тогда необходимо сделать несколько запросов для получения всего отчета.
-# Чтоб сделать это автоматически вы можете указать 
+# Чтоб сделать это автоматически вы можете указать
 # параметр receive_all_data=True при инициализации класса.
 
 api = YandexMetrikaStats(
-    access_token=ACCESS_TOKEN, 
+    access_token=ACCESS_TOKEN,
     # Если True, будет скачивать все части отчета. По умолчанию False.
     receive_all_data=True
 )
@@ -40,27 +40,16 @@ result = api.stats().get(params=params)
 print(result.data)
 ```
 
-Доступные [параметры](https://yandex.ru/dev/metrika/doc/api2/api_v1/data-docpage/)
-отчетов.
+В params можно передать и другие параметры, их больше в моем примере.
 
-#### Формат возвращаемых данных.
-Данные возвращаются в формате объекта **Tapi**.
+Все доступные параметры отчетов [здесь](https://yandex.ru/dev/metrika/doc/api2/api_v1/data-docpage/).
 
-```python
-print(result)
-# Можно получить информацию о последнем запросе.
-print(result().status_code)
-print(result().response)
-print(result().response.headers)
-``` 
-
-##### Вернуть в формате **JSON**
+#### Получить данные ответа.
 ```python
 result = api.stats().get(params=params)
 data = result().data
 print(data)
-[{json_data}, {json_data},]
-# В списке может находится несколько ответов, если отчет состоял из нескольких частей.
+[{json_data}, {json_data},] # В списке может находится несколько ответов, если отчет состоял из нескольких частей.
 ```
 
 ##### Преобразование ответа
@@ -73,6 +62,14 @@ data = result().transform()
 print(data)
 [['ym:s:date', 'ym:s:startOfMonth', 'ym:s:visits', 'ym:s:bounces'],
  ['2019-09-26', '2019-09-01', 80384.0, 9389.0]]
+```
+
+Можно получить информацию о последнем запросе.
+```python
+print(result)
+print(result().status_code)
+print(result().response)
+print(result().response.headers)
 ```
 
 ## Фичи
@@ -96,9 +93,9 @@ api.stats().open_in_browser()
 ## Автор
 Павел Максимов
 
-Связаться со мной можно в 
-[Телеграм](https://t.me/pavel_maksimow) 
-и в 
+Связаться со мной можно в
+[Телеграм](https://t.me/pavel_maksimow)
+и в
 [Facebook](https://www.facebook.com/pavel.maksimow)
 
 Удачи тебе, друг! Поставь звездочку ;)
