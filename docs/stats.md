@@ -37,7 +37,7 @@ params = dict(
     limit=10
 )
 result = api.stats().get(params=params)
-print(result.data)
+print(result().data)
 ```
 
 В params можно передать и другие параметры, их больше в моем примере.
