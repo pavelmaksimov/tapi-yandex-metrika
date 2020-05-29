@@ -39,7 +39,7 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
 
             if data:
                 return data.get("message")
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, simplejson.JSONDecodeError):
             return response.text
 
     def process_response(self, response, **request_kwargs):
@@ -65,7 +65,7 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
     ):
         try:
             jdata = response.json()
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, simplejson.JSONDecodeError):
             raise exceptions.YandexMetrikaApiError(response)
         else:
             error_code = int(jdata.get("code", 0))
