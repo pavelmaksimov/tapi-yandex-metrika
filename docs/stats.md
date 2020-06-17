@@ -4,11 +4,12 @@
 from tapi_yandex_metrika import YandexMetrikaStats
 
 ACCESS_TOKEN = {ваш токен доступа}
+COUNTER_ID = {номер счетчика Я.Метрики}
 
 api = YandexMetrikaStats(access_token=ACCESS_TOKEN)
 
 params = dict(
-    ids="178620",
+    ids=COUNTER_ID,
     metrics="ym:s:visits,ym:s:bounces",
     dimensions="ym:s:date,ym:s:startOfMonth",
     sort="ym:s:date",
@@ -30,7 +31,7 @@ api = YandexMetrikaStats(
     receive_all_data=True
 )
 params = dict(
-    ids="178620",
+    ids=COUNTER_ID,
     metrics="ym:s:visits,ym:s:bounces",
     dimensions="ym:s:date,ym:s:startOfMonth",
     sort="ym:s:date",
