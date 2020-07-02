@@ -128,11 +128,11 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             api_params.get("receive_all_data", False)
             and responses[0].url.find("download") > -1
         ):
-            # Собирает все части отчета в один текст.
+            # Собирает все части отчета в один.
             data, cols = "", ""
             for i in results:
-                cols = i[:i.find("\n")]
-                # Допонлительно удаляется пустая последняя строка.
+                cols = i[:i.find("\n")]  # строка с именами столбцов
+                # Данные без строки со столбцами и без последней пустой строки.
                 data += i[i.find("\n") + 1:-1]
             return "{}\n{}\n".format(cols, data)
         else:
@@ -141,7 +141,9 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
     def transform(self, data, request_kwargs, response, api_params, *args, **kwargs):
         """Преобразование данных."""
         if response.url.find("download") > -1:
-            return [i.split("\t") for i in data.split("\n")][:-1]
+            json_data = [i.split("\t") for i in data.split("\n")]
+            json_data = json_data[:-1]  # удаляется пустая последняя строка
+            return json_data
         else:
             raise NotImplementedError(
                 "Преобразование в JSON доступно только для ответов ресурса download"
@@ -174,6 +176,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             and api_params.get("wait_report", False)
             and response.url.find("download") > -1
         ):
+            # Ошибка появляется при попытке скачать неготовый отчет.
             sleep_time = count_request_error * 20
             logging.info(
                 "Включен режим ожидания готовности отчета. ",
@@ -193,6 +196,9 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
         current_result,
     ):
         """
+        Чтобы получить все части отчета,
+        генерирует параметры для новых запросов к апи.
+
         Формирование дополнительных запросов.
         Они будут сделаны, если отсюда вернется
         непустой массив с набором параметров для запросов.
@@ -280,6 +286,9 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
         current_result,
     ):
         """
+        Чтобы получить все строки отчета,
+        генерирует параметры для новых запросов к апи.
+
         Формирование дополнительных запросов.
         Они будут сделаны, если отсюда вернется
         непустой массив с набором параметров для запросов.
