@@ -19,13 +19,18 @@ logging.basicConfig(level=logging.INFO)
 
 
 class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
-    resource_mapping = MANAGEMENT_RESOURCE_MAPPING
+    resource_mapping = MANAGEMENT_RESOURCE_MAPPING  # карта ресурсов
 
     def get_api_root(self, api_params):
         return "https://api-metrika.yandex.net/"
 
     def get_request_kwargs(self, api_params, *args, **kwargs):
-        """Обогащение запроса, параметрами"""
+        """
+        Обогащение запроса, параметрами.
+
+        :param api_params: dict
+        :return: dict
+        """
         params = super().get_request_kwargs(api_params, *args, **kwargs)
         params["headers"]["Authorization"] = "OAuth {}".format(
             api_params["access_token"]
@@ -33,6 +38,7 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
         return params
 
     def get_error_message(self, data, response=None):
+        """Извлечение комментария к ошибке запроса."""
         try:
             if not data and response.content.strip():
                 data = json.loads(response.content.decode("utf-8"))
@@ -43,17 +49,19 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
             return response.text
 
     def process_response(self, response, **request_kwargs):
-        # При ошибке 500 и в других в ответах может быть json с ошибками.
+        """Обработка ответа запроса."""
         data = self.response_to_native(response)
 
         if isinstance(data, dict) and data.get("errors"):
             raise ResponseProcessException(ClientError, data)
         else:
+            # Дополнительная обработка происходит в методе родительского класса.
             data = super().process_response(response)
 
         return data
 
     def response_to_native(self, response):
+        """Преобразование ответа."""
         if response.content.strip():
             try:
                 return response.json()
@@ -63,6 +71,11 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
     def wrapper_call_exception(
         self, response, tapi_exception, api_params, *args, **kwargs
     ):
+        """
+        Для вызова кастомных исключений.
+        Когда например сервер отвечает 200,
+        а ошибки передаются внутри json.
+        """
         try:
             jdata = response.json()
         except (json.JSONDecodeError, simplejson.JSONDecodeError):
@@ -85,7 +98,16 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
             else:
                 raise exceptions.YandexMetrikaClientError(response)
 
-    def transform_results(self, results, request_kwargs, response, api_params):
+    def transform_results(self, results, requests_kwargs, responses, api_params):
+        """
+        Преобразователь данных после получения всех ответов.
+
+        :param results: list : данные всех запросов
+        :param requests_kwargs: list : параметры всех запросов
+        :param responses: list : ответы всех запросов
+        :param api_params: dict : входящие параметры класса
+        :return: list
+        """
         return results[0] if isinstance(results, list) and results else results
 
 
@@ -93,6 +115,15 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
     resource_mapping = LOGSAPI_RESOURCE_MAPPING
 
     def transform_results(self, results, requests_kwargs, responses, api_params):
+        """
+        Преобразователь данных после получения всех ответов.
+
+        :param results: list : данные всех запросов
+        :param requests_kwargs: list : параметры всех запросов
+        :param responses: list : ответы всех запросов
+        :param api_params: dict : входящие параметры класса
+        :return: list
+        """
         if (
             api_params.get("receive_all_data", False)
             and responses[0].url.find("download") > -1
@@ -108,7 +139,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             return results[0] if isinstance(results, list) and results else results
 
     def transform(self, data, request_kwargs, response, api_params, *args, **kwargs):
-        """Преобразование данных"""
+        """Преобразование данных."""
         if response.url.find("download") > -1:
             return [i.split("\t") for i in data.split("\n")][:-1]
         else:
@@ -127,6 +158,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
     ):
         """
         Условия повторения запроса.
+        Если вернет True, то запрос повторится.
 
         response = tapi_exception.client().response
         status_code = tapi_exception.client().status_code
@@ -160,6 +192,22 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
         response,
         current_result,
     ):
+        """
+        Формирование дополнительных запросов.
+        Они будут сделаны, если отсюда вернется
+        непустой массив с набором параметров для запросов.
+
+        :param api_params: dict : входящие параметры класса
+        :param current_request_kwargs: dict : {headers, data, url, params} : параметры текущего запроса
+        :param request_kwargs_list: list :
+            Наборы параметров для запросов, которые будут сделаны.
+            В него можно добавлять дополнительные наборы параметров, чтоб сделать дополнительные запросы.
+        :param response: request_object : текущий ответ
+        :param current_result: json : текущий результат
+        :return: list : request_kwargs_list
+        """
+        # request_kwargs_list может содержать наборы параметров запросов, которые еще не сделаны.
+        # Поэтому в него нужно добавлять новые, а не заменять.
         if (
             api_params.get("receive_all_data", False)
             and response.url.find("download") > -1
@@ -176,6 +224,13 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
         return request_kwargs_list
 
     def fill_resource_template_url(self, template, params):
+        """
+        Заполнение параметрами, адреса ресурса из которого формируется URL.
+
+        :param template: str : ресурс
+        :param params: dict : параметры
+        :return:
+        """
         if template.find("/part/") > -1 and not params.get("partNumber"):
             # Принудительно добавляет параметр partNumber, если его нет.
             params.update(partNumber=0)
@@ -196,6 +251,7 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
     ):
         """
         Условия повторения запроса.
+        Если вернет True, то запрос повторится.
 
         response = tapi_exception.client().response
         status_code = tapi_exception.client().status_code
@@ -223,6 +279,22 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
         response,
         current_result,
     ):
+        """
+        Формирование дополнительных запросов.
+        Они будут сделаны, если отсюда вернется
+        непустой массив с набором параметров для запросов.
+
+        :param api_params: dict : входящие параметры класса
+        :param current_request_kwargs: dict : {headers, data, url, params} : параметры текущего запроса
+        :param request_kwargs_list: list :
+            Наборы параметров для запросов, которые будут сделаны.
+            В него можно добавлять дополнительные наборы параметров, чтоб сделать дополнительные запросы.
+        :param response: request_object : текущий ответ
+        :param current_result: json : текущий результат
+        :return: list : request_kwargs_list
+        """
+        # request_kwargs_list может содержать наборы параметров запросов, которые еще не сделаны.
+        # Поэтому в него нужно добавлять новые, а не заменять.
         total_rows = int(current_result["total_rows"])
         sampled = current_result["sampled"]
 
@@ -243,7 +315,7 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
         return request_kwargs_list
 
     def transform(self, data, request_kwargs, response, api_params, *args, **kwargs):
-        """Преобразование данных"""
+        """Преобразование данных."""
         new_data = []
         columns = data[0]["query"]["dimensions"] + data[0]["query"]["metrics"]
         for result in data:
@@ -254,7 +326,16 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
                 new_data.append(dimensions + metrics)
         return [columns] + new_data
 
-    def transform_results(self, results, request_kwargs, response, api_params):
+    def transform_results(self, results, requests_kwargs, responses, api_params):
+        """
+        Преобразователь данных после получения всех ответов.
+
+        :param results: list : данные всех запросов
+        :param requests_kwargs: list : параметры всех запросов
+        :param responses: list : ответы всех запросов
+        :param api_params: dict : входящие параметры класса
+        :return: list
+        """
         return results
 
 
