@@ -132,17 +132,19 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             data, cols = "", ""
             for i in results:
                 cols = i[:i.find("\n")]  # строка с именами столбцов
-                # Данные без строки со столбцами и без последней пустой строки.
-                data += i[i.find("\n") + 1:-1]
-            return "{}\n{}\n".format(cols, data)
+                # Данные без строки со столбцами.
+                data += i[i.find("\n") + 1:]
+            return "{}\n{}".format(cols, data)
         else:
             return results[0] if isinstance(results, list) and results else results
 
     def transform(self, data, request_kwargs, response, api_params, *args, **kwargs):
         """Преобразование данных."""
         if response.url.find("download") > -1:
-            json_data = [i.split("\t") for i in data.split("\n")]
-            json_data = json_data[:-1]  # удаляется пустая последняя строка
+            json_data = [
+                i.split("\t") for i in data.split("\n")
+                if i != ""  # удаляется пустая последняя строка
+            ]
             return json_data
         else:
             raise NotImplementedError(
@@ -179,7 +181,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             # Ошибка появляется при попытке скачать неготовый отчет.
             sleep_time = count_request_error * 20
             logging.info(
-                "Включен режим ожидания готовности отчета. ",
+                "Включен режим ожидания готовности отчета. "
                 "Проверка готовности отчета через {} сек.".format(sleep_time)
             )
             time.sleep(sleep_time)
