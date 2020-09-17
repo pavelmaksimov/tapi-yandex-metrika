@@ -36,6 +36,23 @@ body = {
     }
 api.goals().post(data=body)
 
+# Создать цель по событию JavaScript. Через HTTP метод POST.
+body2 = {
+    "goal": {
+        "name": "Название вашей цели в метрике",
+        "type": "action",
+        "is_retargeting": 0,
+        "conditions": [
+                {
+                    "type": "exact",
+                    #Значение newlead заменить на свой идентификатор события
+                    "url": "newlead"
+                }
+            ]
+        }
+    }
+api.goals().post(data=body2)
+
 # Для некоторых ресурсов необходимо подставлять в url идентификатор объекта.
 # Это делается путем добавления в сам метод идентификатора.
 # Получить информацию о цели. Через HTTP метод GET.
@@ -44,7 +61,7 @@ api.goal(goalId=10000).get()
 # Изменить цель. Через HTTP метод PUT.
 body = {
     "goal" : {
-        "id" :  10000,
+        "id" : <int>,
         "name" :  <string> ,
         "type" :  <goal_type>,
         "is_retargeting" :  <boolean>,
