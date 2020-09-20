@@ -220,7 +220,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             new_part = part + 1
             logging.info(
                 "Включен режим получения всех данных. "
-                f"Запрашиваю следующую часть отчета: {new_part}"
+                "Запрашиваю следующую часть отчета: {}".format(new_part)
             )
             new_url = re.sub(r"part/[0-9]*/", "part/{}/".format(new_part), url)
             new_request_kwargs = {**current_request_kwargs, "url": new_url}
