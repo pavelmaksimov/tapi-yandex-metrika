@@ -2,7 +2,7 @@
 
 __author__ = 'Pavel Maksimov'
 __email__ = 'vur21@ya.com'
-__version__ = '2020.7.4'
+__version__ = '2020.9.20'
 
 from .tapi_yandex_metrika import (
     YandexMetrikaStats,
