@@ -131,9 +131,9 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             # Собирает все части отчета в один.
             data, cols = "", ""
             for i in results:
-                cols = i[:i.find("\n")]  # строка с именами столбцов
+                cols = i[: i.find("\n")]  # строка с именами столбцов
                 # Данные без строки со столбцами.
-                data += i[i.find("\n") + 1:]
+                data += i[i.find("\n") + 1 :]
             return "{}\n{}".format(cols, data)
         else:
             return results[0] if isinstance(results, list) and results else results
@@ -142,7 +142,8 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
         """Преобразование данных."""
         if response.url.find("download") > -1:
             json_data = [
-                i.split("\t") for i in data.split("\n")
+                i.split("\t")
+                for i in data.split("\n")
                 if i != ""  # удаляется пустая последняя строка
             ]
             return json_data
@@ -152,13 +153,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             )
 
     def retry_request(
-        self,
-        response,
-        tapi_exception,
-        api_params,
-        count_request_error,
-        *args,
-        **kwargs
+        self, response, tapi_exception, api_params, count_request_error, *args, **kwargs
     ):
         """
         Условия повторения запроса.
@@ -223,8 +218,10 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             url = current_request_kwargs["url"]
             part = int(re.findall(r"part/([0-9]*)/", url)[0])
             new_part = part + 1
-            logging.info("Включен режим получения всех данных. "
-                         f"Запрашиваю следующую часть отчета: {new_part}")
+            logging.info(
+                "Включен режим получения всех данных. "
+                f"Запрашиваю следующую часть отчета: {new_part}"
+            )
             new_url = re.sub(r"part/[0-9]*/", "part/{}/".format(new_part), url)
             new_request_kwargs = {**current_request_kwargs, "url": new_url}
             request_kwargs_list.append(new_request_kwargs)
@@ -249,13 +246,7 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
     resource_mapping = STATS_RESOURCE_MAPPING
 
     def retry_request(
-        self,
-        response,
-        tapi_exception,
-        api_params,
-        count_request_error,
-        *args,
-        **kwargs
+        self, response, tapi_exception, api_params, count_request_error, *args, **kwargs
     ):
         """
         Условия повторения запроса.
@@ -315,11 +306,13 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
 
         if offset <= total_rows:
             logging.info(
-                "Получено строк {}. Всего строк {}".format(offset-1, total_rows)
+                "Получено строк {}. Всего строк {}".format(offset - 1, total_rows)
             )
             if api_params.get("receive_all_data", False):
-                logging.info("Включен режим получения всех данных. "
-                             "Запрашиваю следующие части отчета.")
+                logging.info(
+                    "Включен режим получения всех данных. "
+                    "Запрашиваю следующие части отчета."
+                )
                 new_request_kwargs = current_request_kwargs.copy()
                 new_request_kwargs["params"]["offset"] = offset
                 request_kwargs_list.append(new_request_kwargs)
@@ -352,4 +345,6 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
 
 YandexMetrikaStats = generate_wrapper_from_adapter(YandexMetrikaStatsClientAdapter)
 YandexMetrikaLogsapi = generate_wrapper_from_adapter(YandexMetrikaLogsapiClientAdapter)
-YandexMetrikaManagement = generate_wrapper_from_adapter(YandexMetrikaManagementClientAdapter)
+YandexMetrikaManagement = generate_wrapper_from_adapter(
+    YandexMetrikaManagementClientAdapter
+)
