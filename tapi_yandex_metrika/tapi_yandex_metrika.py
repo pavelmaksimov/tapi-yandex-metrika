@@ -1,6 +1,7 @@
 # coding: utf-8
 import json
 import logging
+import random
 import re
 import time
 
@@ -257,11 +258,31 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
         response_data = tapi_exception.client().data
         """
         status_code = tapi_exception.client().status_code
-        response_data = tapi_exception.client().data
-        error_code = int((response_data or {}).get("code", 0))
+        response_data = tapi_exception.client().data or {}
+        error_code = int(response_data.get("code", 0))
+        errors_types = [i.get("error_type") for i in response_data.get("errors", [])]
+
+        limit_errors = {
+            "quota_requests_by_uid": "Превышен лимит количества запросов к API в сутки для пользователя.",
+            "quota_delegate_requests": "Превышен лимит количества запросов к API на добавление представителей в час для пользователя.",
+            "quota_grants_requests": "Превышен лимит количества запросов к API на добавление доступов к счетчику в час",
+            "quota_requests_by_ip": "Превышен лимит количества запросов к API в секунду для IP адреса.",
+            "quota_parallel_requests": "Превышен лимит количества параллельных запросов к API в сутки для пользователя.",
+            "quota_requests_by_counter_id": "Превышен лимит количества запросов к API в сутки для счётчика.",
+        }
 
         if error_code == 429:
-            logging.error("Превышен лимит запросов")
+            if "quota_requests_by_ip" in errors_types:
+                retry_seconds = random.randint(1, 30)
+                error_text = "{}\nПовторный запрос через {} сек.".format(
+                    limit_errors["quota_requests_by_ip"], retry_seconds
+                )
+                logging.warning(error_text)
+                time.sleep(retry_seconds)
+            else:
+                for err in errors_types:
+                    logging.error(limit_errors[err])
+
         elif error_code == 503:
             if count_request_error < api_params.get("retries_if_server_error", 3):
                 logging.warning("Серверная ошибка. Повторный запрос через 3 секунды")
