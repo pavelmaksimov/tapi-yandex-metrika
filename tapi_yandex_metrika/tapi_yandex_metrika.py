@@ -279,6 +279,7 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
                 )
                 logging.warning(error_text)
                 time.sleep(retry_seconds)
+                return True
             else:
                 for err in errors_types:
                     logging.error(limit_errors[err])
