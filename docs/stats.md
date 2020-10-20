@@ -41,16 +41,14 @@ result = api.stats().get(params=params)
 print(result().data)
 ```
 
-В params можно передать и другие параметры, их больше в моем примере.
-
-Все доступные параметры отчетов [здесь](https://yandex.ru/dev/metrika/doc/api2/api_v1/data-docpage/).
+В params можно передать [много других параметров](https://yandex.ru/dev/metrika/doc/api2/api_v1/data-docpage/).
 
 #### Получить данные ответа.
 ```python
 result = api.stats().get(params=params)
 data = result().data
 print(data)
-[{json_data}, {json_data},] # В списке может находится несколько ответов, если отчет состоял из нескольких частей.
+[{json_data}, {json_data},] # В списке может находится несколько ответов
 ```
 
 ##### Преобразование ответа
@@ -67,7 +65,6 @@ print(data)
 
 Можно получить информацию о последнем запросе.
 ```python
-print(result)
 print(result().status_code)
 print(result().response)
 print(result().response.headers)
