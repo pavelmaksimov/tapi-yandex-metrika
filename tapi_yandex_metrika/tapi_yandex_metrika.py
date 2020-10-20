@@ -19,8 +19,8 @@ from .resource_mapping import (
 logging.basicConfig(level=logging.INFO)
 
 
-class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
-    resource_mapping = MANAGEMENT_RESOURCE_MAPPING  # карта ресурсов
+class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiAdapter):
+    resource_mapping = NotImplementedError  # карта ресурсов
 
     def get_api_root(self, api_params):
         return "https://api-metrika.yandex.net/"
@@ -99,6 +99,56 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
             else:
                 raise exceptions.YandexMetrikaClientError(response)
 
+    def retry_request(
+        self, response, tapi_exception, api_params, count_request_error, *args, **kwargs
+    ):
+        """
+        Условия повторения запроса.
+        Если вернет True, то запрос повторится.
+
+        response = tapi_exception.client().response
+        status_code = tapi_exception.client().status_code
+        response_data = tapi_exception.client().data
+        """
+        status_code = tapi_exception.client().status_code
+        response_data = tapi_exception.client().data or {}
+        error_code = int(response_data.get("code", 0))
+        errors_types = [i.get("error_type") for i in response_data.get("errors", [])]
+
+        limit_errors = {
+            "quota_requests_by_uid": "Превышен лимит количества запросов к API в сутки для пользователя.",
+            "quota_delegate_requests": "Превышен лимит количества запросов к API на добавление представителей в час для пользователя.",
+            "quota_grants_requests": "Превышен лимит количества запросов к API на добавление доступов к счетчику в час",
+            "quota_requests_by_ip": "Превышен лимит количества запросов к API в секунду для IP адреса.",
+            "quota_parallel_requests": "Превышен лимит количества параллельных запросов к API в сутки для пользователя.",
+            "quota_requests_by_counter_id": "Превышен лимит количества запросов к API в сутки для счётчика.",
+        }
+
+        if error_code == 429:
+            if "quota_requests_by_ip" in errors_types:
+                retry_seconds = random.randint(1, 30)
+                error_text = "{}\nПовторный запрос через {} сек.".format(
+                    limit_errors["quota_requests_by_ip"], retry_seconds
+                )
+                logging.warning(error_text)
+                time.sleep(retry_seconds)
+                return True
+            else:
+                for err in errors_types:
+                    logging.error(limit_errors[err])
+
+        elif error_code == 503:
+            if count_request_error < api_params.get("retries_if_server_error", 3):
+                logging.warning("Серверная ошибка. Повторный запрос через 3 секунды")
+                time.sleep(3)
+                return True
+
+        return False
+
+
+class YandexMetrikaManagementClientAdapter(YandexMetrikaClientAdapterAbstract):
+    resource_mapping = MANAGEMENT_RESOURCE_MAPPING  # карта ресурсов
+
     def transform_results(self, results, requests_kwargs, responses, api_params):
         """
         Преобразователь данных после получения всех ответов.
@@ -112,7 +162,7 @@ class YandexMetrikaManagementClientAdapter(JSONAdapterMixin, TapiAdapter):
         return results[0] if isinstance(results, list) and results else results
 
 
-class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
+class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = LOGSAPI_RESOURCE_MAPPING
 
     def transform_results(self, results, requests_kwargs, responses, api_params):
@@ -183,7 +233,9 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
             time.sleep(sleep_time)
             return True
 
-        return False
+        return super().retry_request(
+            response, tapi_exception, api_params, count_request_error, *args, **kwargs
+        )
 
     def extra_request(
         self,
@@ -243,54 +295,8 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaManagementClientAdapter):
         return template.format(**params)
 
 
-class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
+class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
     resource_mapping = STATS_RESOURCE_MAPPING
-
-    def retry_request(
-        self, response, tapi_exception, api_params, count_request_error, *args, **kwargs
-    ):
-        """
-        Условия повторения запроса.
-        Если вернет True, то запрос повторится.
-
-        response = tapi_exception.client().response
-        status_code = tapi_exception.client().status_code
-        response_data = tapi_exception.client().data
-        """
-        status_code = tapi_exception.client().status_code
-        response_data = tapi_exception.client().data or {}
-        error_code = int(response_data.get("code", 0))
-        errors_types = [i.get("error_type") for i in response_data.get("errors", [])]
-
-        limit_errors = {
-            "quota_requests_by_uid": "Превышен лимит количества запросов к API в сутки для пользователя.",
-            "quota_delegate_requests": "Превышен лимит количества запросов к API на добавление представителей в час для пользователя.",
-            "quota_grants_requests": "Превышен лимит количества запросов к API на добавление доступов к счетчику в час",
-            "quota_requests_by_ip": "Превышен лимит количества запросов к API в секунду для IP адреса.",
-            "quota_parallel_requests": "Превышен лимит количества параллельных запросов к API в сутки для пользователя.",
-            "quota_requests_by_counter_id": "Превышен лимит количества запросов к API в сутки для счётчика.",
-        }
-
-        if error_code == 429:
-            if "quota_requests_by_ip" in errors_types:
-                retry_seconds = random.randint(1, 30)
-                error_text = "{}\nПовторный запрос через {} сек.".format(
-                    limit_errors["quota_requests_by_ip"], retry_seconds
-                )
-                logging.warning(error_text)
-                time.sleep(retry_seconds)
-                return True
-            else:
-                for err in errors_types:
-                    logging.error(limit_errors[err])
-
-        elif error_code == 503:
-            if count_request_error < api_params.get("retries_if_server_error", 3):
-                logging.warning("Серверная ошибка. Повторный запрос через 3 секунды")
-                time.sleep(3)
-                return True
-
-        return False
 
     def extra_request(
         self,
@@ -351,18 +357,6 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaManagementClientAdapter):
                 metrics = row["metrics"]
                 new_data.append(dimensions + metrics)
         return [columns] + new_data
-
-    def transform_results(self, results, requests_kwargs, responses, api_params):
-        """
-        Преобразователь данных после получения всех ответов.
-
-        :param results: list : данные всех запросов
-        :param requests_kwargs: list : параметры всех запросов
-        :param responses: list : ответы всех запросов
-        :param api_params: dict : входящие параметры класса
-        :return: list
-        """
-        return results
 
 
 YandexMetrikaStats = generate_wrapper_from_adapter(YandexMetrikaStatsClientAdapter)
