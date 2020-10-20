@@ -1,5 +1,6 @@
 # coding: utf-8
 import logging
+
 import yaml
 
 from tapi_yandex_metrika import YandexMetrikaManagement
@@ -10,15 +11,15 @@ with open("../config.yml", "r") as stream:
     data_loaded = yaml.safe_load(stream)
 
 ACCESS_TOKEN = data_loaded["token"]
+COUNTER_ID = data_loaded["counter_id"]
 
 api = YandexMetrikaManagement(
-    access_token=ACCESS_TOKEN,
-    default_url_params={'counterId': 178620}
+    access_token=ACCESS_TOKEN, default_url_params={"counterId": COUNTER_ID}
 )
 
 
 def test_info():
-    api.goals().info()
+    api.clients().info()
 
 
 def test_get_counters():
@@ -28,28 +29,17 @@ def test_get_counters():
 
 
 def test_get_clients():
-    r = api.clients().get()
+    r = api.clients().get(params={"counters": [COUNTER_ID]})
     print(r)
 
 
 def test_get_goals():
     r = api.goals().get()
-    print(r)
-
-
-def test_create_goal():
-    body = {
-        "goal": {
-            "name": "2 страницы",
-            "type": "number",
-            "is_retargeting": 0,
-            "depth": 2
-        }
-    }
-    r = api.goals().post(data=body)
+    global goal_id
+    goal_id = r().data["goals"][0]["id"]
     print(r)
 
 
 def test_get_goal():
-    r = api.goal(goalId=13571870).get()
+    r = api.goal(goalId=goal_id).get()
     print(r)
