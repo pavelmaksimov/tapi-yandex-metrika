@@ -1,4 +1,3 @@
-# coding: utf-8
 
 STATS_RESOURCE_MAPPING = {
     "stats": {
@@ -88,7 +87,8 @@ MANAGEMENT_RESOURCE_MAPPING = {
  & [sort=<counters_sort>]
  & [status=<counter_status>]
  & [type=<counter_type>]""",
-        "methods": ["GET", "POST"]
+        "methods": ["GET", "POST"],
+        "response_data_key": "counters",
     },
     "counter": {
         "resource": "management/v1/counter/{counterId}",
@@ -106,7 +106,8 @@ MANAGEMENT_RESOURCE_MAPPING = {
         "resource": "management/v1/counter/{counterId}/goals",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/management/goals/goals-docpage/",
         "params": """[callback=<string>] & [useDeleted=<boolean>]""",
-        "methods": ["GET", "POST"]
+        "methods": ["GET", "POST"],
+        "response_data_key": "goals",
     },
     "goal": {
         "resource": "management/v1/counter/{counterId}/goal/{goalId}",
@@ -118,13 +119,15 @@ MANAGEMENT_RESOURCE_MAPPING = {
         "resource": "management/v1/accounts",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/management/accounts/accounts-docpage/",
         "params": """[callback=<string>] & [user_login=<string>]""",
-        "methods": ["GET", "DELETE", "PUT"]
+        "methods": ["GET", "DELETE", "PUT"],
+        "response_data_key": "accounts",
     },
     "clients": {
         "resource": "management/v1/clients",
         "docs": "https://yandex.ru/dev/metrika/doc/api2/management/direct_clients/getclients-docpage/",
         "params": """counters=<list>""",
-        "methods": ["GET", ]
+        "methods": ["GET", ],
+        "response_data_key": "clients",
     },
     "filters": {
         "resource": "management/v1/counter/{counterId}/filters",

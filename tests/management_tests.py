@@ -1,6 +1,4 @@
-# coding: utf-8
 import logging
-
 import yaml
 
 from tapi_yandex_metrika import YandexMetrikaManagement
@@ -19,13 +17,12 @@ api = YandexMetrikaManagement(
 
 
 def test_info():
-    api.clients().info()
+    print(dir(api))
 
 
 def test_get_counters():
     r = api.counters().get(params={"sort": "Visits"})
-    print(r)
-    print(r().data)
+    print(r.data)
 
 
 def test_get_clients():
@@ -36,7 +33,7 @@ def test_get_clients():
 def test_get_goals():
     r = api.goals().get()
     global goal_id
-    goal_id = r().data["goals"][0]["id"]
+    goal_id = r.data["goals"][0]["id"]
     print(r)
 
 

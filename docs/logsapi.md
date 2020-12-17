@@ -1,75 +1,91 @@
-## Документация по Logs API
+# Documentation for downloading reports from Yandex Metrika LOGS API
+
+[Official documentation Yandex Metrika LOGS API](https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html)
+
 ```python
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
+ACCESS_TOKEN = <access_token>
+COUNTER_ID = <counter_id>
 
-ACCESS_TOKEN = {ваш токен доступа}
-COUNTER_ID = {идентификатор счетчика}
-
-api = YandexMetrikaLogsapi(
+client = YandexMetrikaLogsapi(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID}
 )
 
-params={
+params = {
     "fields": "ym:s:date,ym:s:clientID",
     "source": "visits",
-    "date1": "2019-01-01",
-    "date2": "2019-01-01"
+    "date1": "2021-01-01",
+    "date2": "2021-01-01"
 }
 
-# Проверить возможность создания отчета. Через HTTP метод GET.
-result = api.evaluate().get(params=params)
+# Check the possibility of creating a report. Via HTTP GET method.
+result = client.evaluate().get(params=params)
 print(result)
 
 
-# Заказать отчет. Через HTTP метод POST.
-result = api.create().post(params=params)
-request_id = result().data["log_request"]["request_id"]
+# Order a report. Via HTTP POST method.
+result = client.create().post(params=params)
+request_id = result["log_request"]["request_id"]
 print(result)
 
 
-# Отменить создание отчета. Через HTTP метод POST.
-result = api.cancel(requestId=request_id).post()
+# Cancel report creation. Via HTTP POST method.
+result = client.cancel(requestId=request_id).post()
 print(result)
 
 
-# Удалить отчет. Через HTTP метод POST.
-result = api.clean(requestId=request_id).post()
+# Delete report. Via HTTP POST method.
+result = client.clean(requestId=request_id).post()
 print(result)
 
 
-# Получить информацию обо всех отчетах хранящихся на сервере. Через HTTP метод GET.
-result = api.allinfo().get()
+# Get information about all reports stored on the server. Via HTTP GET method.
+result = client.allinfo().get()
 print(result)
 
 
-# Получить информацию о конкретном отчете. Через HTTP метод GET.
-result = api.info(requestId=request_id).get()
+# Get information about a specific report. Via HTTP GET method.
+result = client.info(requestId=request_id).get()
 print(result)
 
 
-# Скачать отчет. Через HTTP метод POST.
-result = api.create().post(params=params)
-request_id = result().data["log_request"]["request_id"]
+# Download the report. Via HTTP POST method.
+result = client.create().post(params=params)
+request_id = result["log_request"]["request_id"]
 
-# Отчет можно скачать, когда он будет сформирован на сервере. Через HTTP метод GET.
-result = api.info(requestId=request_id).get()
-if result["log_request"]["status"] == "processed":
-    # Отчет может состоять из нескольких частей.
-    parts = result["log_request"]["parts"]  # Кол-во частей в отчете.
-    print("Кол-во частей", parts)
-    # В параметр partNumber указывается номер части отчета, который хотите скачать.
-    # Скачаем первую часть.
-    result = api.download(requestId=request_id, partNumber=0).get()
-    data = result().data
-    print(data[:1000])
+# The report can be downloaded when it is generated on the server. Via HTTP GET method.
+info = client.info(requestId=request_id).get()
+if info["log_request"]["status"] == "processed":
+
+    # The report can consist of several parts.
+    parts = info["log_request"]["parts"]
+    print("Number of parts in the report", parts)
+
+    # The partNumber parameter specifies the number of the part of the report that you want to download.
+    # Default partNumber=0
+    part = client.download(requestId=request_id, partNumber=0).get()
+
+    print("Raw data")
+    data = part.data[:1000]
+
+    print("Column names")
+    print(part.columns)
+
+    # Transform to values
+    print(part().to_values()[:3])
+
+    # Transform to lines
+    print(part().to_lines()[:3])
 else:
-    print("Отчет еще не готов")
+    print("Report not ready yet")
 ```
 
-В библиотеке есть функция, которая
-подождет, когда отчет будет сформирован и скачает все его части.
+#### Download the report when it will be created
+
+add param **wait_report**
+
 ```python
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
@@ -79,12 +95,8 @@ COUNTER_ID = {идентификатор счетчика}
 api = YandexMetrikaLogsapi(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID},
-    # Если True, скачает первую часть отчета, когда он будет сформирован.
-    # По умолчанию False.
+    # Download the report when it will be created
     wait_report=True,
-    # Если True, будет скачивать все части отчета.
-    # По умолчанию False.
-    receive_all_data=True
 )
 params={
     "fields": "ym:s:date,ym:s:clientID,ym:s:dateTime,ym:s:startURL,ym:s:endURL",
@@ -92,64 +104,121 @@ params={
     "date1": "2019-01-01",
     "date2": "2019-01-01"
 }
-result = api.create().post(params=params)
-request_id = result().data["log_request"]["request_id"]
-# Когда включен параметр receive_all_data=True, параметр partNumber можно не указывать.
-result = api.download(requestId=request_id).get()
-data = result().data
-print(data[:1000])
+info = client.create().post(params=params)
+request_id = info["log_request"]["request_id"]
+
+report = client.download(requestId=request_id).get()
+
+print("Column names")
+print(report.columns)
+
+print("Raw data")
+data = report.data[:1000]
+
+# Transform to values
+print(report().to_values()[:3])
+
+# Transform to lines
+print(report().to_lines()[:3])
 ```
 
-Есть метод преобразования данных для ресурса **download**.
+#### Export of all report pages.
 ```python
-result = api.download(requestId=request_id).get()
-data_as_json = result().transform()
-print(data_as_json[:2])
-[
-    ['ym:s:date', 'ym:s:startOfMonth', 'ym:s:visits', 'ym:s:bounces'],
-    ['2019-09-26', '2019-09-01', 80384.0, 9389.0]
- ]
+# Iteration parts.
+report = client.download(requestId=request_id).get()
+print(report.columns)
+for part in report().parts():
+    print(part.data[:1000])
+    print(part().to_values()[:3])
+    print(part().to_lines()[:3])
+    print(part().to_columns()) # columns data orient
+
+for part in report().parts():
+    # Iteration lines.
+    for line in part().lines():
+        print('line', line)
+
+    # Iteration values.
+    for values in part().values():
+        print('values', values)
+
+
+# "Will iterate over all lines of all parts"
+
+report = client.download(requestId=request_id).get()
+print(report.columns)
+
+for line in report().iter_lines():
+    print('line', line)
+
+for values in report().iter_values():
+    print('values', values)
 ```
 
-Можно получить информацию о последнем сделанном запросе
+#### Limit iteration
+
+    .parts(max_parts: int = None)
+    .lines(max_items: int = None)
+    .values(max_items: int = None)
+    .iter_lines(max_parts: int = None, max_items: int = None)
+    .iter_values(max_parts: int = None, max_items: int = None)
+
+#### Resonse
 
 ```python
-result = api.allinfo().get()
-print(result().status_code)
-print(result().response)
-print(result().response.headers)
+info = client.allinfo().get()
+print(info.response)
+print(info.response.headers)
+print(info.response.status_code)
+
+report = client.download(requestId=request_id).get()
+for part in report().parts():
+    print(part.response)
+    print(part.response.headers)
+    print(part.response.status_code)
 ```
 
-Обращайте внимание каким HTTP методом вы отправляете запрос.
-Некоторые ресурсы работают только с POST или только с GET запросами.
-Например ресурс **create** только с методом POST
+#### Warning
+Pay attention to which HTTP method you send the request.
+Some resources work only with POST or only with GET requests.
+For example create resource with POST method only
 
-    api.create().post(params=params)
+    client.create().post(params=params)
 
-А метод **evaluate** только с методом GET
+And evaluate method only with GET method
 
-    api.evaluate().get(params=params)
+    client.evaluate().get(params=params)
 
 
-## Фичи
-
-Можно вывести на печать описание ресурса через метод info
-```python
-# Указываете интересующий ресурс, а после него .info()
-api.create().info()
-```
-
-Открыть документацию ресурса в браузере
-```python
-api.create().open_docs()
-```
-
-## Автор
-Павел Максимов
-
-Связаться со мной можно в
-[Телеграм](https://t.me/pavel_maksimow)
-и в
+## Authors
+Pavel Maksimov -
+[Telegram](https://t.me/pavel_maksimow),
 [Facebook](https://www.facebook.com/pavel.maksimow)
 
+Good luck friend! Put an asterisk;)
+
 Удачи тебе, друг! Поставь звездочку ;)
+
+Copyright (c) Pavel Maksimov.
+
+## Change log
+### Release 2021.2.21
+
+**Backward Incompatible Change**
+
+- Drop method "transform"
+- Drop param "receive_all_data"
+
+**New Feature**
+- translated into english
+- add iteration method "parts"
+- add iteration method "lines"
+- add iteration method "values"
+- add iteration method "iter_lines"
+- add iteration method "iter_values"
+- add attribut "columns"
+- add attribut "data"
+- add attribut "response"
+- add method "to_lines"
+- add method "to_values"
+- add method "to_columns"

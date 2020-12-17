@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 
 try:
     from setuptools import setup
@@ -29,7 +27,7 @@ def get_version(package):
 setup(
     name="tapi-yandex-metrika",
     version=get_version(package),
-    description="Python библиотека для API Яндекс Метрики",
+    description="Python client for API Yandex Metrika",
     long_description=readme,
     long_description_content_type="text/markdown",
     author="Pavel Maksimov",
@@ -37,7 +35,7 @@ setup(
     url="https://github.com/pavelmaksimov/tapi-yandex-metrika",
     packages=[package],
     include_package_data=True,
-    install_requires=["requests-oauthlib>=0.4.2", "simplejson", "tapi-wrapper==2019.12.10"],
+    install_requires=["orjson", "tapi-wrapper2>=0.1,<0.2"],
     license="MIT",
     zip_safe=False,
     keywords="tapi,wrapper,yandex,metrika,api",
