@@ -6,8 +6,8 @@
 ``` python
 from tapi_yandex_metrika import YandexMetrikaManagement
 
-ACCESS_TOKEN = {ваш токен доступа}
-COUNTER_ID = {идентификатор счетчика}
+ACCESS_TOKEN = ""
+COUNTER_ID = ""
 
 client = YandexMetrikaManagement(
     access_token=ACCESS_TOKEN,

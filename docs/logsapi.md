@@ -5,8 +5,8 @@
 ```python
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
-ACCESS_TOKEN = <access_token>
-COUNTER_ID = <counter_id>
+ACCESS_TOKEN = ""
+COUNTER_ID = ""
 
 client = YandexMetrikaLogsapi(
     access_token=ACCESS_TOKEN,
@@ -89,8 +89,8 @@ add param **wait_report**
 ```python
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
-ACCESS_TOKEN = {ваш токен доступа}
-COUNTER_ID = {идентификатор счетчика}
+ACCESS_TOKEN = ""
+COUNTER_ID = ""
 
 api = YandexMetrikaLogsapi(
     access_token=ACCESS_TOKEN,

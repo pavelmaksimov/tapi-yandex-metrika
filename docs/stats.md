@@ -6,8 +6,8 @@
 import datetime as dt
 from tapi_yandex_metrika import YandexMetrikaStats
 
-ACCESS_TOKEN = <access_token>
-COUNTER_ID = <counter_id>
+ACCESS_TOKEN = ""
+COUNTER_ID = ""
 
 client = YandexMetrikaStats(access_token=ACCESS_TOKEN)
 
