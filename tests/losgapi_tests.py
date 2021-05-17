@@ -1,8 +1,7 @@
-import mock
-import requests
 import time
+
+import responses
 import yaml
-from tapi2.adapters import TapiAdapter
 
 from tapi_yandex_metrika import YandexMetrikaLogsapi
 
@@ -56,7 +55,7 @@ def test_download():
     report = api.download(requestId=request_id).get()
     for part in report().parts(max_parts=2):
         for line in part().lines(max_items=2):
-            print('line', line)
+            print("line", line)
 
         print("part", part().to_values()[:1])
         print("part", part().to_lines()[:1])
@@ -68,10 +67,10 @@ def test_download():
 def test_iter():
     report = api.download(requestId=request_id).get()
     for line in report().iter_lines(max_items=2):
-        print('line', line)
+        print("line", line)
 
     for values in report().iter_values(max_items=2):
-        print('values', values)
+        print("values", values)
 
 
 def test_get_info():
@@ -97,8 +96,8 @@ def test_cancel():
     print(r)
 
 
+@responses.activate
 def test_transform():
-    requests.sessions.Session.request = mock.Mock(return_value=None)
     response_data = (
         "col1\tcol2\n"
         "val1\tval2\n"
@@ -106,19 +105,41 @@ def test_transform():
         "val111\tval222\n"
         "val1111\tval2222\n"
     )
-    TapiAdapter.process_response = mock.Mock(return_value=response_data)
-    report = api.download(requestId=None).get()
+    responses.add(
+        responses.GET,
+        "https://api-metrika.yandex.net/management/v1/counter/8011147/logrequest/0/part/0/download",
+        body=response_data,
+        status=200,
+    )
+    report = api.download(requestId=0).get()
 
     assert report.columns == ["col1", "col2"]
     assert report().to_values() == [
-        ['val1', 'val2'], ['val11', 'val22'], ['val111', 'val222'], ['val1111', 'val2222']
+        ["val1", "val2"],
+        ["val11", "val22"],
+        ["val111", "val222"],
+        ["val1111", "val2222"],
     ]
-    assert report().to_lines() == ['val1\tval2', 'val11\tval22', 'val111\tval222', 'val1111\tval2222']
-    assert report().to_columns() == [['val1', 'val11', 'val111', 'val1111'], ['val2', 'val22', 'val222', 'val2222']]
+    assert report().to_lines() == [
+        "val1\tval2",
+        "val11\tval22",
+        "val111\tval222",
+        "val1111\tval2222",
+    ]
+    assert report().to_columns() == [
+        ["val1", "val11", "val111", "val1111"],
+        ["val2", "val22", "val222", "val2222"],
+    ]
+    assert report().to_dicts() == [
+        {"col1": "val1", "col2": "val2"},
+        {"col1": "val11", "col2": "val22"},
+        {"col1": "val111", "col2": "val222"},
+        {"col1": "val1111", "col2": "val2222"},
+    ]
 
 
+@responses.activate
 def test_iteration():
-    requests.sessions.Session.request = mock.Mock(return_value=None)
     response_data = (
         "col1\tcol2\n"
         "val1\tval2\n"
@@ -126,11 +147,27 @@ def test_iteration():
         "val111\tval222\n"
         "val1111\tval2222\n"
     )
+    responses.add(
+        responses.GET,
+        "https://api-metrika.yandex.net/management/v1/counter/8011147/logrequest/0/part/0/download",
+        body=response_data,
+        status=200,
+    )
+    responses.add(
+        responses.GET,
+        "https://api-metrika.yandex.net/management/v1/counter/8011147/logrequest/0/part/1/download",
+        body=response_data,
+        status=200,
+    )
+
+    columns = response_data.split("\n")[0].split("\t")
     expected_lines = response_data.split("\n")[1:]
     expected_values = [i.split("\t") for i in response_data.split("\n")[1:]]
+    expected_dicts = [
+        dict(zip(columns, i.split("\t"))) for i in response_data.split("\n")[1:]
+    ]
 
-    TapiAdapter.process_response = mock.Mock(return_value=response_data)
-    report = api.download(requestId=None).get()
+    report = api.download(requestId=0).get()
 
     for part in report().parts(max_parts=1):
         assert 4 == len(list(part().lines()))
@@ -142,8 +179,14 @@ def test_iteration():
         for values, expected in zip(part().values(), expected_values):
             assert values == expected
 
+        for values, expected in zip(part().dicts(), expected_dicts):
+            assert values == expected
+
     for line, expected in zip(report().iter_lines(max_items=3), expected_lines):
         assert line == expected
 
     for values, expected in zip(report().iter_values(max_items=3), expected_values[:4]):
+        assert values == expected
+
+    for values, expected in zip(report().iter_dicts(max_items=3), expected_dicts[:4]):
         assert values == expected

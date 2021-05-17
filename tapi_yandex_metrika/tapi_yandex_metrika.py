@@ -200,7 +200,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
                 raise exceptions.YandexMetrikaDownloadReportError(
                     response,
                     message="The report does not exist, it has been cleared. "
-                    "Curent report status is '{}'".format(status),
+                    "Current report status is '{}'".format(status),
                 )
             kwargs["store"][request_id] = "exists"
 
@@ -290,23 +290,46 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
         client = kwargs["client"]
         yield from client.pages(max_pages=max_parts)
 
-    def iter_lines(self, max_parts=None, max_items=None, **kwargs):
+    def iter_lines(self, max_parts=None, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        yield from client.iter_items(max_pages=max_parts, max_items=max_items)
+        yield from client.iter_items(max_pages=max_parts, max_items=max_rows)
 
-    def iter_values(self, max_parts=None, max_items=None, **kwargs):
+    def iter_values(self, max_parts=None, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        for line in client.iter_items(max_pages=max_parts, max_items=max_items):
+        for line in client.iter_items(max_pages=max_parts, max_items=max_rows):
             yield line.split("\t")
 
-    def lines(self, max_items=None, **kwargs):
+    def iter_dicts(self, max_parts=None, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        yield from client.items(max_items=max_items)
+        for values in client.iter_values(max_pages=max_parts, max_items=max_rows):
+            yield dict(zip(kwargs["store"]["columns"], values))
 
-    def values(self, max_items=None, **kwargs):
+    def lines(self, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        for line in client.items(max_items=max_items):
+        yield from client.items(max_items=max_rows)
+
+    def values(self, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
+        client = kwargs["client"]
+        for line in client.items(max_items=max_rows):
             yield line.split("\t")
+
+    def dicts(self, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
+        client = kwargs["client"]
+        for line in client.items(max_items=max_rows):
+            yield dict(zip(kwargs["store"]["columns"], line.split("\t")))
+
+    def to_dicts(self, data, **kwargs):
+        return [
+            dict(zip(kwargs["store"]["columns"], line.split("\t")))
+            for line in data.split("\n")[1:]
+            if line
+        ]
 
     def to_values(self, data, **kwargs):
         return [line.split("\t") for line in data.split("\n")[1:] if line]

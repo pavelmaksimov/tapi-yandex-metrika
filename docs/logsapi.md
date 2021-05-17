@@ -78,11 +78,14 @@ if info["log_request"]["status"] == "processed":
 
     # Transform to lines
     print(part().to_lines()[:3])
+
+    # Transform to dicts
+    print(part().to_dicts()[:3])
 else:
     print("Report not ready yet")
 ```
 
-#### Download the report when it will be created
+## Automatically download the report when it is prepared
 
 add param **wait_report**
 
@@ -109,61 +112,80 @@ request_id = info["log_request"]["request_id"]
 
 report = client.download(requestId=request_id).get()
 
+print("Raw data")
+data = report.data
+
 print("Column names")
 print(report.columns)
 
-print("Raw data")
-data = report.data[:1000]
-
 # Transform to values
-print(report().to_values()[:3])
+print(report().to_values())
 
 # Transform to lines
-print(report().to_lines()[:3])
+print(report().to_lines())
+
+# Transform to dict
+print(report().to_dicts())
 ```
 
-#### Export of all report pages.
+## Export of all report parts.
 ```python
-# Iteration parts.
 report = client.download(requestId=request_id).get()
+
 print(report.columns)
+
+# Iteration parts.
 for part in report().parts():
-    print(part.data[:1000])
-    print(part().to_values()[:3])
-    print(part().to_lines()[:3])
-    print(part().to_columns()) # columns data orient
+    print(part.data)  # raw data
+    print(part().to_values())
+    print(part().to_lines())
+    print(part().to_columns())  # columns data orient
+    print(part().to_dicts())
 
 for part in report().parts():
     # Iteration lines.
-    for line in part().lines():
-        print('line', line)
+    for row_as_text in part().lines():
+        print(row_as_text)
 
     # Iteration values.
-    for values in part().values():
-        print('values', values)
+    for row_as_values in part().values():
+        print(row_as_values)
+
+    # Iteration dicts.
+    for row_as_dict in part().dicts():
+        print(row_as_dict)
 
 
-# "Will iterate over all lines of all parts"
-
-report = client.download(requestId=request_id).get()
-print(report.columns)
-
-for line in report().iter_lines():
-    print('line', line)
-
-for values in report().iter_values():
-    print('values', values)
 ```
 
-#### Limit iteration
+## Iterate all rows of all parts of the report
+
+Will iterate over all lines of all parts
+
+```python
+report = client.download(requestId=request_id).get()
+
+print(report.columns)
+
+for row_as_line in report().iter_lines():
+    print(row_as_line)
+
+for row_as_values in report().iter_values():
+    print(row_as_values)
+
+for row_as_dict in report().iter_dicts():
+    print(row_as_dict)
+```
+
+## Limit iteration
 
     .parts(max_parts: int = None)
-    .lines(max_items: int = None)
-    .values(max_items: int = None)
-    .iter_lines(max_parts: int = None, max_items: int = None)
-    .iter_values(max_parts: int = None, max_items: int = None)
+    .lines(max_rows: int = None)
+    .values(max_rows: int = None)
+    .iter_lines(max_parts: int = None, max_rows: int = None)
+    .iter_values(max_parts: int = None, max_rows: int = None)
 
-#### Resonse
+## Response
 
 ```python
 info = client.allinfo().get()
@@ -178,7 +200,7 @@ for part in report().parts():
     print(part.response.status_code)
 ```
 
-#### Warning
+## Warning
 Pay attention to which HTTP method you send the request.
 Some resources work only with POST or only with GET requests.
 For example create resource with POST method only
@@ -190,7 +212,7 @@ And evaluate method only with GET method
     client.evaluate().get(params=params)
 
 
-## Authors
+## AUTHORS
 Pavel Maksimov -
 [Telegram](https://t.me/pavel_maksimow),
 [Facebook](https://www.facebook.com/pavel.maksimow)
@@ -201,7 +223,15 @@ Good luck friend! Put an asterisk;)
 
 Copyright (c) Pavel Maksimov.
 
-## Change log
+
+## CHANGELOG
+### Release 2021.5.15
+- add iteration method "dicts"
+- add iteration method "iter_dicts"
+- add method "to_dicts"
+- rename parameter max_items to max_rows in iter_lines, iter_values, lines, values
+
+
 ### Release 2021.2.21
 
 **Backward Incompatible Change**
