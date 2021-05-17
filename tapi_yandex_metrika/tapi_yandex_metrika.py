@@ -131,8 +131,10 @@ class YandexMetrikaClientAdapterAbstract(JSONAdapterMixin, TapiAdapter):
         api_params,
         **kwargs
     ):
-        if error_message.get("error_text"):
-            raise exceptions.YandexMetrikaApiError(response)
+        if "error_text" in error_message:
+            raise exceptions.YandexMetrikaApiError(
+                response, error_message["error_text"]
+            )
         else:
             error_code = int(error_message.get("code", 0))
 

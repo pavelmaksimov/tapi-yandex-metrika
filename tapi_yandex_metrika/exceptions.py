@@ -1,19 +1,15 @@
-import logging
-
-
 class YandexMetrikaApiError(Exception):
     def __init__(self, response, message=None, *args, **kwargs):
         self.response = response
         self.message = message
 
     def __str__(self):
-        logging.info("HEADERS = " + str(self.response.headers))
-        logging.info("URL = " + self.response.url)
-        return "{} {} {} {}".format(
+        return "{} {} {}\nHEADERS = {}\nURL = {}".format(
             self.response.status_code,
             self.response.reason,
-            self.message or "",
-            self.response.text
+            self.message or self.response.text,
+            self.response.headers,
+            self.response.url,
         )
 
 
