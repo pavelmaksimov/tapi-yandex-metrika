@@ -1,8 +1,8 @@
-[Official documentation API Yandex Metrika](https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html)
-
 # Documentation for downloading reports from API Yandex Metrika (Как скачать данные из API Яндекс Метрика)
 
-``` python
+[Official documentation API Yandex Metrika](https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html)
+
+```python
 import datetime as dt
 from tapi_yandex_metrika import YandexMetrikaStats
 
@@ -23,8 +23,8 @@ params = dict(
 )
 report = client.stats().get(params=params)
 
-# Response data
-print(report.data)
+# Raw data
+report.data
 
 report.columns
 # ['ym:s:date', 'ym:s:visits']
@@ -38,6 +38,8 @@ report().to_values()
 #    ['2020-10-05', 14579.0]
 #]
 
+report().to_dicts()
+
 # Column data orient
 report().to_columns()
 #[
@@ -47,62 +49,77 @@ report().to_columns()
 
 ```
 
-#### Export of all report pages.
+## Export of all report pages.
 ``` python
-print("Iteratin report pages")
+print("iteration report pages")
 for page in report().pages():
-    page_values = page().to_values()
-    print(page_values)
-# [['2020-10-01', 14234.0], ['2020-10-02', 12508.0], ['2020-10-03', 12365.0], ['2020-10-04', 14588.0], ['2020-10-05', 14579.0]]
-# [['2020-10-06', 12795.0]]
+    # Raw data.
+    print(page.data)
 
+    print(page().to_dicts())
+    print(page().to_columns())
+    print(page().to_values())
 
-print("Iteratin report rows")
+print("iteration report pages")
 for page in report().pages():
-    for row in page().rows():
-        print(row)
-# ['2020-10-01', 14234.0]
-# ['2020-10-02', 12508.0]
-# ['2020-10-03', 12365.0]
-# ['2020-10-04', 14588.0]
-# ['2020-10-05', 14579.0]
-# ['2020-10-06', 12795.0]
+    print("iteration rows as values")
+    for row_as_values_of_page in page().values():
+        print(row_as_values_of_page)
+    # ['2020-10-01', 14234.0]
+    # ['2020-10-02', 12508.0]
+    # ['2020-10-03', 12365.0]
+    # ['2020-10-04', 14588.0]
+    # ['2020-10-05', 14579.0]
+    # ['2020-10-06', 12795.0]
 
-
-print("Will iterate over all lines of all pages")
-for row in report().iter_rows():
-    print(row)
-# ['2020-10-01', 14234.0]
-# ['2020-10-02', 12508.0]
-# ['2020-10-03', 12365.0]
-# ['2020-10-04', 14588.0]
-# ['2020-10-05', 14579.0]
-# ['2020-10-06', 12795.0]
+    print("iteration rows as dict")
+    for row_as_dict_of_page in page().dicts():
+        print(row_as_dict_of_page)
 ```
 
-#### Iteration limit.
+## Iterate all rows of all parts of the report
+
+Will iterate over all lines of all parts
+
+```python
+for values in report().iter_values():
+    print(values)
+# ['2020-10-01', 14234.0]
+# ['2020-10-02', 12508.0]
+# ['2020-10-03', 12365.0]
+# ['2020-10-04', 14588.0]
+# ['2020-10-05', 14579.0]
+# ['2020-10-06', 12795.0]
+
+for row_as_dict in report().iter_dicts():
+    print(row_as_dict)
+```
+
+## Iteration limit.
 
     .pages(max_pages: int = None)
-    .rows(max_items: int = None)
-    .iter_rows(max_pages: int = None, max_items: int = None)
+    .values(max_rows: int = None)
+    .dicts(max_rows: int = None)
+    .iter_values(max_pages: int = None, max_rows: int = None)
+    .iter_dicts(max_pages: int = None, max_rows: int = None)
 
-``` python
-print("Iteratin report rows with limit")
+```python
+print("iteration report rows with limit")
 for page in report().pages(max_pages=2):
-    for row in page().rows(max_items=2):
-        print(row)
+    for values in page().values(max_rows=2):
+        print(values)
 # ['2020-10-01', 14234.0]
 # ['2020-10-02', 12508.0]
 # ['2020-10-06', 12795.0]
 
 
 print("Will iterate over all lines of all pages with limit")
-for row in report().iter_rows(max_pages=2, max_items=1):
-    print(row)
+for values in report().iter_values(max_pages=2, max_rows=1):
+    print(values)
 # ['2020-10-01', 14234.0]
 ```
 
-#### Response
+## Response
 ```python
 report = client.stats().get(params=params)
 print(report.response)
@@ -116,7 +133,7 @@ for page in report().pages():
 ```
 
 
-## Authors
+## AUTHORS
 Pavel Maksimov -
 [Telegram](https://t.me/pavel_maksimow),
 [Facebook](https://www.facebook.com/pavel.maksimow)
@@ -125,9 +142,18 @@ Good luck friend! Put an asterisk;)
 
 Удачи тебе, друг! Поставь звездочку ;)
 
-Copyright (c) Pavel Maksimov.
 
-## Change log
+## CHANGELOG
+### Release 2021.5.15
+- add iteration method "iter_values"
+- add iteration method "iter_dicts"
+- add iteration method "values"
+- add iteration method "dicts"
+- add method "to_dicts"
+- rename parameter max_items to max_rows in iter_rows
+
+
+
 ### Release 2021.2.21
 
 **Backward Incompatible Change**
@@ -145,3 +171,6 @@ Copyright (c) Pavel Maksimov.
 - add attribut "response"
 - add method "to_values"
 - add method "to_columns"
+
+\
+Copyright (c) Pavel Maksimov.

@@ -395,6 +395,12 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
 
         return columns
 
+    def to_dicts(self, data, **kwargs):
+        return [
+            dict(zip(kwargs["store"]["columns"], row))
+            for row in self._iter_transform_data(data)
+        ]
+
     def get_iterator_next_request_kwargs(
         self, response_data, response, request_kwargs, api_params, **kwargs
     ):
@@ -415,13 +421,31 @@ class YandexMetrikaStatsClientAdapter(YandexMetrikaClientAdapterAbstract):
     def get_iterator_items(self, data, **kwargs):
         return self._iter_transform_data(data)
 
-    def iter_rows(self, max_pages=None, max_items=None, **kwargs):
+    def iter_rows(self, max_pages=None, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        yield from client.iter_items(max_pages=max_pages, max_items=max_items)
+        yield from client.iter_items(max_pages=max_pages, max_items=max_rows)
 
-    def rows(self, max_items=None, **kwargs):
+    def iter_values(self, max_pages=None, max_rows=None, **kwargs):
+        return self.iter_rows(max_pages=max_pages, max_rows=max_rows, **kwargs)
+
+    def iter_dicts(self, max_pages=None, max_rows=None, **kwargs):
+        for values in self.iter_values(
+            max_pages=max_pages, max_rows=max_rows, **kwargs
+        ):
+            yield dict(zip(kwargs["store"]["columns"], values))
+
+    def rows(self, max_rows=None, **kwargs):
+        max_rows = max_rows or kwargs.get("max_items")
         client = kwargs["client"]
-        yield from client.items(max_items=max_items)
+        yield from client.items(max_items=max_rows)
+
+    def values(self, max_rows=None, **kwargs):
+        return self.rows(max_rows=max_rows, **kwargs)
+
+    def dicts(self, max_rows=None, **kwargs):
+        for values in self.values(max_rows=max_rows, **kwargs):
+            yield dict(zip(kwargs["store"]["columns"], values))
 
 
 YandexMetrikaStats = generate_wrapper_from_adapter(YandexMetrikaStatsClientAdapter)
