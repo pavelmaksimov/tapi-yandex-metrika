@@ -35,7 +35,7 @@ setup(
     url="https://github.com/pavelmaksimov/tapi-yandex-metrika",
     packages=[package],
     include_package_data=True,
-    install_requires=["orjson", "tapi-wrapper2>=0.1,<0.2"],
+    install_requires=["requests", "orjson", "tapi-wrapper2>=0.1,<0.2"],
     license="MIT",
     zip_safe=False,
     keywords="tapi,wrapper,yandex,metrika,api",
