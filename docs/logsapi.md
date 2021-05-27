@@ -95,7 +95,7 @@ from tapi_yandex_metrika import YandexMetrikaLogsapi
 ACCESS_TOKEN = ""
 COUNTER_ID = ""
 
-api = YandexMetrikaLogsapi(
+client = YandexMetrikaLogsapi(
     access_token=ACCESS_TOKEN,
     default_url_params={'counterId': COUNTER_ID},
     # Download the report when it will be created
@@ -130,6 +130,11 @@ print(report().to_dicts())
 
 ## Export of all report parts.
 ```python
+from tapi_yandex_metrika import YandexMetrikaLogsapi
+
+client = YandexMetrikaLogsapi(...)
+info = client.create().post(params=...)
+request_id = info["log_request"]["request_id"]
 report = client.download(requestId=request_id).get()
 
 print(report.columns)
@@ -163,6 +168,12 @@ for part in report().parts():
 Will iterate over all lines of all parts
 
 ```python
+
+from tapi_yandex_metrika import YandexMetrikaLogsapi
+
+client = YandexMetrikaLogsapi(...)
+info = client.create().post(params=...)
+request_id = info["log_request"]["request_id"]
 report = client.download(requestId=request_id).get()
 
 print(report.columns)
@@ -188,13 +199,20 @@ for row_as_dict in report().iter_dicts():
 ## Response
 
 ```python
-info = client.allinfo().get()
+
+from tapi_yandex_metrika import YandexMetrikaLogsapi
+
+client = YandexMetrikaLogsapi(...)
+info = client.create().post(params=...)
+
+print(info.data)
 print(info.response)
 print(info.response.headers)
-print(info.response.status_code)
+print(info.status_code)
 
-report = client.download(requestId=request_id).get()
+report = client.download(requestId=info["log_request"]["request_id"]).get()
 for part in report().parts():
+    print(part.data)
     print(part.response)
     print(part.response.headers)
     print(part.response.status_code)

@@ -24,9 +24,9 @@ params = dict(
 report = client.stats().get(params=params)
 
 # Raw data
-report.data
+print(report.data)
 
-report.columns
+print(report.columns)
 # ['ym:s:date', 'ym:s:visits']
 
 report().to_values()
@@ -50,7 +50,12 @@ report().to_columns()
 ```
 
 ## Export of all report pages.
-``` python
+```python
+from tapi_yandex_metrika import YandexMetrikaStats
+
+client = YandexMetrikaStats(access_token=...)
+report = client.stats().get(params=...)
+
 print("iteration report pages")
 for page in report().pages():
     # Raw data.
@@ -82,6 +87,11 @@ for page in report().pages():
 Will iterate over all lines of all parts
 
 ```python
+from tapi_yandex_metrika import YandexMetrikaStats
+
+client = YandexMetrikaStats(access_token=...)
+report = client.stats().get(params=...)
+
 for values in report().iter_values():
     print(values)
 # ['2020-10-01', 14234.0]
@@ -104,6 +114,11 @@ for row_as_dict in report().iter_dicts():
     .iter_dicts(max_pages: int = None, max_rows: int = None)
 
 ```python
+from tapi_yandex_metrika import YandexMetrikaStats
+
+client = YandexMetrikaStats(access_token=...)
+report = client.stats().get(params=...)
+
 print("iteration report rows with limit")
 for page in report().pages(max_pages=2):
     for values in page().values(max_rows=2):
@@ -121,7 +136,11 @@ for values in report().iter_values(max_pages=2, max_rows=1):
 
 ## Response
 ```python
-report = client.stats().get(params=params)
+from tapi_yandex_metrika import YandexMetrikaStats
+
+client = YandexMetrikaStats(access_token=...)
+report = client.stats().get(params=...)
+
 print(report.response)
 print(report.response.status_code)
 print(report.response.headers)

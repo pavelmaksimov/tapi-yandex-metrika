@@ -3,7 +3,7 @@
 [Official documentation API Yandex Metrika](https://yandex.ru/dev/metrika/doc/api2/management/intro.html)
 
 
-``` python
+```python
 from tapi_yandex_metrika import YandexMetrikaManagement
 
 ACCESS_TOKEN = ""
@@ -15,10 +15,8 @@ client = YandexMetrikaManagement(
 )
 ```
 
-### Method help
+### Resources
 ```python
-# The YandexMetrikaManagement class is created dynamically,
-# so you can find out the available methods after initialization.
 print(dir(client))
 ['accounts', 'chart_annotation', 'chart_annotations', 'clients', 'counter', 'counter_undelete',
  'counters', 'delegate', 'delegates', 'filter', 'filters', 'goal', 'goals', 'grant', 'grants', 'label',
@@ -44,22 +42,29 @@ client.counters().open_docs()
 ```
 
 How to send different types of HTTP requests
+
+:param params: querystring arguments in the URL\
+:param data: send data in the body of the request
 ```python
-# GET request
-client.counters().get(params={})
-# POST request
-client.counters().post(data={}, params={})
-# DELETE request
-client.counters().delete(...)
-# PUT request
-client.counters().put(...)
-# PATCH request
-client.counters().patch(...)
-# OPTIONS request
-client.counters().options(...)
+# Send HTTP 'GET' request
+client.counters().get(data: dict = None, params: dict = None)
+# Send HTTP 'POST' request
+client.counters().post(data: dict = None, params: dict = None)
+# Send HTTP 'DELETE' request
+client.counters().delete(data: dict = None, params: dict = None)
+# Send HTTP 'PUT' request
+client.counters().put(data: dict = None, params: dict = None)
+# Send HTTP 'PATCH' request
+client.counters().patch(data: dict = None, params: dict = None)
+# Send HTTP 'OPTIONS' request
+client.counters().options(data: dict = None, params: dict = None)
 ```
 
 ```python
+from tapi_yandex_metrika import YandexMetrikaManagement
+
+client = YandexMetrikaManagement(...)
+
 # Get counters. Via HTTP GET method.
 counters = client.counters().get()
 print(counters.data)
@@ -116,17 +121,12 @@ client.goal(goalId=10000).put(data=body)
 client.goal(goalId=10000).delete()
 ```
 
-For available resource parameters and object identifiers that must be specified in the method, look in
-[help](https://yandex.ru/dev/metrika/doc/api2/management/intro-docpage/)
-and or in [resource map](https://github.com/pavelmaksimov/tapi-yandex-metrika/blob/master/tapi_yandex_metrika/resource_mapping.py).
-
-
 You can get information about the request.
 ```python
 counters = client.counters().get()
 print(counters.response)
 print(counters.response.headers)
-print(counters.response.status_code)
+print(counters.status_code)
 ```
 
 
