@@ -144,6 +144,10 @@ Good luck friend! Put an asterisk;)
 
 
 ## CHANGELOG
+### Release 2021.5.27
+- Add stub file (syntax highlighting)
+
+
 ### Release 2021.5.15
 - add iteration method "iter_values"
 - add iteration method "iter_dicts"

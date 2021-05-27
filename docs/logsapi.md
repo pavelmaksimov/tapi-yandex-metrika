@@ -225,6 +225,10 @@ Copyright (c) Pavel Maksimov.
 
 
 ## CHANGELOG
+### Release 2021.5.27
+- Add stub file (syntax highlighting)
+
+
 ### Release 2021.5.15
 - add iteration method "dicts"
 - add iteration method "iter_dicts"
