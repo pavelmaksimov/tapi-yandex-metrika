@@ -141,7 +141,11 @@ Good luck friend! Put an asterisk;)
 
 Copyright (c) Pavel Maksimov.
 
-## Change log
+## CHANGELOG
+### Release 2021.5.27
+- Add stub file (syntax highlighting)
+
+
 ### Release 2021.2.21
 
 **New Feature**

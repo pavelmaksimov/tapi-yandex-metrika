@@ -54,7 +54,7 @@ def test_create():
 def test_download():
     report = api.download(requestId=request_id).get()
     for part in report().parts(max_parts=2):
-        for line in part().lines(max_items=2):
+        for line in part().lines(max_rows=2):
             print("line", line)
 
         print("part", part().to_values()[:1])
@@ -66,10 +66,10 @@ def test_download():
 
 def test_iter():
     report = api.download(requestId=request_id).get()
-    for line in report().iter_lines(max_items=2):
+    for line in report().iter_lines(max_rows=2):
         print("line", line)
 
-    for values in report().iter_values(max_items=2):
+    for values in report().iter_values(max_rows=2):
         print("values", values)
 
 
@@ -182,11 +182,11 @@ def test_iteration():
         for values, expected in zip(part().dicts(), expected_dicts):
             assert values == expected
 
-    for line, expected in zip(report().iter_lines(max_items=3), expected_lines):
+    for line, expected in zip(report().iter_lines(max_rows=3), expected_lines):
         assert line == expected
 
-    for values, expected in zip(report().iter_values(max_items=3), expected_values[:4]):
+    for values, expected in zip(report().iter_values(max_rows=3), expected_values[:4]):
         assert values == expected
 
-    for values, expected in zip(report().iter_dicts(max_items=3), expected_dicts[:4]):
+    for values, expected in zip(report().iter_dicts(max_rows=3), expected_dicts[:4]):
         assert values == expected
