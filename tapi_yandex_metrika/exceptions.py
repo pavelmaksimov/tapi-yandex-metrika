@@ -50,7 +50,7 @@ class BackwardCompatibilityError(Exception):
 
     def __str__(self):
         return (
-            "Starting from version 2021.2.21, this {} is deprecated and not supported. "
+            "This {} is deprecated and not supported. "
             "Install a later version "
             "'pip install --upgrade tapi-yandex-metrika==2020.10.20'. "
             "Info https://github.com/pavelmaksimov/tapi-yandex-metrika"
