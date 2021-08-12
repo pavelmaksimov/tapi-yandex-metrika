@@ -18,7 +18,7 @@ params = dict(
     metrics="ym:s:visits",
     dimensions="ym:s:date",
     sort="ym:s:date",
-    limit=5
+    lang="en",
     # Other params -> https://yandex.ru/dev/metrika/doc/api2/api_v1/data.html
 )
 report = client.stats().get(params=params)
@@ -84,7 +84,7 @@ for page in report().pages():
 
 ## Iterate all rows of all parts of the report
 
-Will iterate over all lines of all parts
+Will iterate over all lines of all pages
 
 ```python
 from tapi_yandex_metrika import YandexMetrikaStats
