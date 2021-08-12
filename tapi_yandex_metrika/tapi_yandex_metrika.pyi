@@ -23,7 +23,7 @@ class YandexMetrikaClientExecutor:
     def help(self) -> YandexMetrikaClientExecutor:
         """Print docs of resource."""
     def get(
-        self, *, params: dict = None, data: dict = None
+        self, *, params: dict = None, data: dict = None, headers: dict = None
     ) -> YandexMetrikaBaseMethods:
         """
         Send HTTP 'GET' request.
@@ -32,7 +32,7 @@ class YandexMetrikaClientExecutor:
         :param data: send data in the body of the request
         """
     def post(
-        self, *, params: dict = None, data: dict = None
+        self, *, params: dict = None, data: dict = None, headers: dict = None
     ) -> YandexMetrikaBaseMethods:
         """
         Send HTTP 'POST' request.
@@ -41,7 +41,7 @@ class YandexMetrikaClientExecutor:
         :param data: send data in the body of the request
         """
     def put(
-        self, *, params: dict = None, data: dict = None
+        self, *, params: dict = None, data: dict = None, headers: dict = None
     ) -> YandexMetrikaBaseMethods:
         """
         Send HTTP 'PUT' request.
@@ -50,7 +50,7 @@ class YandexMetrikaClientExecutor:
         :param data: send data in the body of the request
         """
     def putch(
-        self, *, params: dict = None, data: dict = None
+        self, *, params: dict = None, data: dict = None, headers: dict = None
     ) -> YandexMetrikaBaseMethods:
         """
         Send HTTP 'PUTCH' request.
@@ -59,7 +59,7 @@ class YandexMetrikaClientExecutor:
         :param data: send data in the body of the request
         """
     def delete(
-        self, *, params: dict = None, data: dict = None
+        self, *, params: dict = None, data: dict = None, headers: dict = None
     ) -> YandexMetrikaBaseMethods:
         """
         Send HTTP 'DELETE' request.
@@ -68,7 +68,7 @@ class YandexMetrikaClientExecutor:
         :param data: send data in the body of the request
         """
     def options(
-        self, *, params: dict = None, data: dict = None
+        self, *, params: dict = None, data: dict = None, headers: dict = None
     ) -> YandexMetrikaBaseMethods:
         """
         Send HTTP 'OPTIONS' request.
@@ -495,7 +495,7 @@ class YandexMetrikaLogsapiClientExecutor:
     def help(self) -> YandexMetrikaLogsapiClientExecutor:
         """Print docs of resource."""
     def get(
-        self, *, params: dict = None, data: dict = None
+        self, *, params: dict = None, data: dict = None, headers: dict = None
     ) -> YandexMetrikaLogsapiClientExecutorResponse:
         """
         Send HTTP 'GET' request.
@@ -504,7 +504,7 @@ class YandexMetrikaLogsapiClientExecutor:
         :param data: send data in the body of the request
         """
     def post(
-        self, *, params: dict = None, data: dict = None
+        self, *, params: dict = None, data: dict = None, headers: dict = None
     ) -> YandexMetrikaLogsapiClientExecutorResponse:
         """
         Send HTTP 'POST' request.
