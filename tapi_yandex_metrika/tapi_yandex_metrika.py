@@ -192,19 +192,18 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
             **kwargs
         )
 
-    def _is_exists_report(self, response, api_params, **kwargs):
+    def _check_status_report(self, response, api_params, **kwargs):
         request_id = api_params["default_url_params"]["requestId"]
         if kwargs["store"].get(request_id) is None:
             client = kwargs["client"]
             info = client.info(requestId=request_id).get()
             status = info.data["log_request"]["status"]
-            if "cleaned" in status:
+            if status not in ("processed", "created"):
                 raise exceptions.YandexMetrikaDownloadReportError(
                     response,
-                    message="The report does not exist, it has been cleared. "
-                    "Current report status is '{}'".format(status),
+                    message=f"Such status '{status}' of the report does not allow downloading it",
                 )
-            kwargs["store"][request_id] = "exists"
+            kwargs["store"][request_id] = status
 
     def retry_request(
         self,
@@ -214,7 +213,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
         response,
         request_kwargs,
         api_params,
-        **kwargs
+        **kwargs,
     ):
         """
         Conditions for repeating a request. If it returns True, the request will be repeated.
@@ -226,13 +225,13 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
             and "download" in request_kwargs["url"]
             and api_params.get("wait_report", False)
         ):
-            self._is_exists_report(response, api_params, **kwargs)
+            self._check_status_report(response, api_params, **kwargs)
 
             # The error appears when trying to download an unprepared report.
             max_sleep = 60 * 5
             sleep_time = repeat_number * 60
             sleep_time = sleep_time if sleep_time <= max_sleep else max_sleep
-            logger.info("Wait report {} sec.".format(sleep_time))
+            logger.info("Wait report %s sec.", sleep_time)
             time.sleep(sleep_time)
 
             return True
@@ -244,7 +243,7 @@ class YandexMetrikaLogsapiClientAdapter(YandexMetrikaClientAdapterAbstract):
             response,
             request_kwargs,
             api_params,
-            **kwargs
+            **kwargs,
         )
 
     def fill_resource_template_url(self, template, params, resource):

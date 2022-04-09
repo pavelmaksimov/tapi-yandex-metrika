@@ -243,6 +243,10 @@ Copyright (c) Pavel Maksimov.
 
 
 ## CHANGELOG
+### Release 2022.4.8
+- Stop waiting a report if the report status is invalid by raising an error
+
+
 ### Release 2021.5.28
 - Add stub file (syntax highlighting)
 

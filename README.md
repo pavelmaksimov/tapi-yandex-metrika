@@ -13,7 +13,7 @@ Prev version
 
 Last version. Has backward incompatible changes.
 
-    pip install --upgrade tapi-yandex-metrika==2021.5.28
+    pip install --upgrade tapi-yandex-metrika==2022.4.8
 
 ## Documentation
 
